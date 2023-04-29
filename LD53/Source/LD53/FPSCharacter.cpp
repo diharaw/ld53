@@ -4,10 +4,12 @@
 #include "FPSCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "SteeringWheel.h"
 #include "AltitudeLever.h"
+#include "PickUppable.h"
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
@@ -38,6 +40,9 @@ void AFPSCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	m_GrabConstraint = FindComponentByClass<UPhysicsConstraintComponent>();
+	m_GrabSlotMesh = FindComponentByClass<UStaticMeshComponent>();
 }
 
 // Called every frame
@@ -58,6 +63,9 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
+		//Throw
+		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Started, this, &AFPSCharacter::Throw);
+
 		//Interacting
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AFPSCharacter::Interact);
 
@@ -73,7 +81,12 @@ void AFPSCharacter::Interact()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Interact"));
 
-	if (m_SteeringWheel)
+	if (m_PickedUpObject)
+	{
+		DropObject();
+		m_PickedUpObject = nullptr;
+	}
+	else if (m_SteeringWheel)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Steering Mode"));
 		m_SteeringWheel = nullptr;
@@ -97,7 +110,23 @@ void AFPSCharacter::Interact()
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Altitude Mode"));
 				m_AltitudeLever = Cast<AAltitudeLever>(m_HitActor);
 			}
+			else if (m_HitActor->IsA<APickUppable>())
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Pick Up Mode"));
+				m_PickedUpObject = Cast<APickUppable>(m_HitActor);
+				GrabObject();
+			}
 		}
+	}
+}
+
+void AFPSCharacter::Throw()
+{
+	if (m_PickedUpObject)
+	{
+		DropObject();
+		m_PickedUpObject->Throw(FirstPersonCameraComponent->GetForwardVector() * ObjectThrowImpulse);
+		m_PickedUpObject = nullptr;
 	}
 }
 
@@ -107,17 +136,21 @@ void AFPSCharacter::Move(const FInputActionValue& Value)
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
-	{
-		// add movement 
-		if (m_SteeringWheel)
-			m_SteeringWheel->RotateWheel(MovementVector.X);
-		else if (m_AltitudeLever)
-			return;
-		else
+	{ 
+		if (!m_PickedUpObject)
 		{
-			AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-			AddMovementInput(GetActorRightVector(), MovementVector.X);
+			if (m_SteeringWheel)
+			{
+				m_SteeringWheel->RotateWheel(MovementVector.X);
+				return;
+			}
+			else if (m_AltitudeLever)
+				return;
 		}
+		
+		// add movement
+		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
+		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
 }
 
@@ -165,7 +198,27 @@ void AFPSCharacter::CheckForInteractableActor()
 	// If the trace hit something, bBlockingHit will be true,
 	// and its fields will be filled with detailed info about what was hit
 	if (Hit.bBlockingHit && IsValid(Hit.GetActor()))
+	{
+		m_HitPoint = Hit.ImpactPoint;
 		m_HitActor = Hit.GetActor();
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Hit Actor: %s"), *Hit.GetActor()->GetName()));
+	}
 	else
+	{
+		m_HitPoint = FVector::ZeroVector;
 		m_HitActor = nullptr;
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No Hit Actor"));
+	}
+}
+
+void AFPSCharacter::GrabObject()
+{
+	m_GrabConstraint->SetConstrainedComponents(m_GrabSlotMesh, "", m_PickedUpObject->GetMesh(), "");
+	m_PickedUpObject->GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+}
+
+void AFPSCharacter::DropObject()
+{
+	m_PickedUpObject->GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+	m_GrabConstraint->BreakConstraint();
 }

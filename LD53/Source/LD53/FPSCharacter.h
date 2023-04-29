@@ -8,8 +8,11 @@
 #include "FPSCharacter.generated.h"
 
 class UCameraComponent;
+class UPhysicsConstraintComponent;
+class UStaticMeshComponent;
 class ASteeringWheel;
 class AAltitudeLever;
+class APickUppable;
 
 UCLASS()
 class LD53_API AFPSCharacter : public ACharacter
@@ -36,6 +39,10 @@ class LD53_API AFPSCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* InteractAction;
 
+	/** Interact Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ThrowAction;
+
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
@@ -43,10 +50,17 @@ class LD53_API AFPSCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, Category = "Members")
 	float MaxTraceDistance = 100.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Members")
+	float ObjectThrowImpulse = 100000.0f;
+
 private:
+	APickUppable* m_PickedUpObject = nullptr;
 	ASteeringWheel* m_SteeringWheel = nullptr;
 	AAltitudeLever* m_AltitudeLever = nullptr;
 	AActor* m_HitActor = nullptr;
+	FVector m_HitPoint = FVector::ZeroVector;
+	UStaticMeshComponent* m_GrabSlotMesh = nullptr;
+	UPhysicsConstraintComponent* m_GrabConstraint = nullptr;
 
 public:
 	// Sets default values for this character's properties
@@ -58,6 +72,9 @@ protected:
 
 	/** Called for interact input */
 	void Interact();
+
+	/** Called for throw input */
+	void Throw();
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -74,4 +91,6 @@ public:
 
 private:
 	void CheckForInteractableActor();
+	void GrabObject();
+	void DropObject();
 };
