@@ -8,7 +8,7 @@ ALD53GameMode::ALD53GameMode()
 	: Super()
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/LD53/Blueprints/BP_FPSCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
 }
