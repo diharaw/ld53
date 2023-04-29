@@ -4,6 +4,14 @@
 #include "AirShip.h"
 #include "Rudder.h"
 
+float GetAngleDifferenceClockwise(float from, float to)
+{
+	float diff = fmod(from - to, 360.0); // diff now in (-360.0 ... 360.0) range
+	if (diff >= 180.0) diff -= 360.0;     // diff now in (-360.0 ... 180.0) range
+	else if (diff < -180.0) diff += 360.0;// diff now in [-180.0 ... 180.0) range
+	return diff;
+}
+
 // Sets default values
 AAirShip::AAirShip()
 {
@@ -76,7 +84,11 @@ void AAirShip::HandleHeading(float _deltaTime)
 
 	if (Rudder)
 	{
-		FRotator rudderRotation = FRotator(0.0f, FMath::Clamp(-TargetHeading, -60.0f, 60.0f), 0.0f);
+		float diff = GetAngleDifferenceClockwise(TargetHeading, rotation.Yaw);
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Diff: %f"), diff));
+
+		FRotator rudderRotation = FRotator(0.0f, FMath::Clamp(-diff, -60.0f, 60.0f), 0.0f);
 
 		Rudder->SetActorRelativeRotation(rudderRotation);
 	}
