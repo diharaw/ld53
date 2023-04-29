@@ -2,6 +2,7 @@
 
 
 #include "AirShip.h"
+#include "Rudder.h"
 
 // Sets default values
 AAirShip::AAirShip()
@@ -71,6 +72,13 @@ void AAirShip::HandleHeading(float _deltaTime)
 		headingRotation.Yaw = TargetHeading;
 
 		HeadingIndicator->SetActorRotation(headingRotation);
+	}
+
+	if (Rudder)
+	{
+		FRotator rudderRotation = FRotator(0.0f, FMath::Clamp(-TargetHeading, -60.0f, 60.0f), 0.0f);
+
+		Rudder->SetActorRelativeRotation(rudderRotation);
 	}
 }
 

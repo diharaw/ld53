@@ -8,6 +8,7 @@
 #include "AirShip.generated.h"
 
 class AAltitudeLeverHinge;
+class ARudder;
 
 UCLASS()
 class LD53_API AAirShip : public AActor
@@ -31,6 +32,9 @@ class LD53_API AAirShip : public AActor
 
 	UPROPERTY(EditAnywhere, Category = "Members")
 	AActor* HeadingIndicator;
+
+	UPROPERTY(EditAnywhere, Category = "Members")
+	ARudder* Rudder;
 
 	UPROPERTY(EditAnywhere, Category = "Members")
 	AAltitudeLeverHinge* AltitudeLeverHinge;
