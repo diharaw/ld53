@@ -31,6 +31,12 @@ class LD53_API AAirShip : public AActor
 	float TargetAltitude = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Members")
+	float PowerFromCoalPiece = 20.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Members")
+	float PowerConsumptionRate = 5.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Members")
 	AActor* HeadingIndicator;
 
 	UPROPERTY(EditAnywhere, Category = "Members")
@@ -44,6 +50,7 @@ private:
 	float m_ActualSpeed = 0.0f;
 	FRotator m_TargetHeadingRot;
 	float m_ActualAltitude = 0.0f;
+	float m_Power = 100.0f;
 
 public:	
 	// Sets default values for this actor's properties
@@ -69,10 +76,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LD53 AirShip")
 	void UpdateTargetAltitudeNormalized(float _NormalizedAltitude);
 
+	UFUNCTION(BlueprintCallable, Category = "LD53 AirShip")
+	void AddCoalPiece();
+
 	float GetTargetAltitudeNormalized();
 
 private:
 	void HandleHeading(float _deltaTime);
 	void HandleMovement(float _deltaTime);
 	void HandleAltitude(float _deltaTime);
+	void ConsumePower();
 };

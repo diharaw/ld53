@@ -58,6 +58,14 @@ void AAirShip::UpdateTargetAltitudeNormalized(float _NormalizedAltitude)
 	TargetAltitude = MinAltitude + _NormalizedAltitude * (MaxAltitude - MinAltitude);
 }
 
+void AAirShip::AddCoalPiece()
+{
+	m_Power += PowerFromCoalPiece;
+	m_Power = FMath::Clamp(m_Power, 0.0f, 100.0f);
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Added Coal Piece: %f"), m_Power));
+}
+
 float AAirShip::GetTargetAltitudeNormalized()
 {
 	return (TargetAltitude - MinAltitude) / (MaxAltitude - MinAltitude);
@@ -86,8 +94,6 @@ void AAirShip::HandleHeading(float _deltaTime)
 	{
 		float diff = GetAngleDifferenceClockwise(TargetHeading, rotation.Yaw);
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Diff: %f"), diff));
-
 		FRotator rudderRotation = FRotator(0.0f, FMath::Clamp(-diff, -60.0f, 60.0f), 0.0f);
 
 		Rudder->SetActorRelativeRotation(rudderRotation);
@@ -114,4 +120,9 @@ void AAirShip::HandleAltitude(float _deltaTime)
 	position.Z = m_ActualAltitude;
 
 	SetActorLocation(position);
+}
+
+void AAirShip::ConsumePower()
+{
+
 }
