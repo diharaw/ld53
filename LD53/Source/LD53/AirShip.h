@@ -75,6 +75,9 @@ class LD53_API AAirShip : public AActor
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	AAltitudeLeverHinge* AltitudeLeverHinge;
 
+	UPROPERTY(EditAnywhere, Category = "LD53")
+	int NumTotalDeliveryItems;
+
 private:
 	UStaticMeshComponent* m_Cube;
 	float m_ActualSpeed = 0.0f;
@@ -85,6 +88,9 @@ private:
 	float m_Power = 100.0f;
 	float m_WindHeading = 0.0f;
 	float m_SailRotation = 0.0f;
+	int m_NumDeliveryItems = 0;
+	int m_NumDeliveredItems = 0;
+	int m_NumLostItems = 0;
 
 public:	
 	// Sets default values for this actor's properties
@@ -125,6 +131,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
 	float GetTargetAltitudeNormalized();
+
+	UFUNCTION(BlueprintCallable, Category = "LD53")
+	void OnItemDelivered();
+
+	UFUNCTION(BlueprintCallable, Category = "LD53")
+	void OnItemLost();
 
 private:
 	void HandleHeading(float _deltaTime);

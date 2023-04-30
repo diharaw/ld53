@@ -24,6 +24,8 @@ AAirShip::AAirShip()
 void AAirShip::BeginPlay()
 {
 	Super::BeginPlay();
+
+	m_NumDeliveryItems = NumTotalDeliveryItems;
 	
 	GetWorld()->GetTimerManager().SetTimer(m_PowerConsumptionTimerHandle, this, &AAirShip::OnConsumePower, 1.0f, true);
 	GetWorld()->GetTimerManager().SetTimer(m_WindDirectionChangeTimerHandle, this, &AAirShip::OnWindDirectionChange, TimeBetweenWindDirectionChanges, true);
@@ -105,6 +107,28 @@ float AAirShip::GetSailEffectiveness()
 float AAirShip::GetTargetAltitudeNormalized()
 {
 	return (TargetAltitude - MinAltitude) / (MaxAltitude - MinAltitude);
+}
+
+void AAirShip::OnItemDelivered()
+{
+	if (m_NumDeliveryItems > 1)
+	{
+		m_NumDeliveryItems--;
+		m_NumDeliveredItems++;
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Item Delivered! Remaining: %i"), m_NumDeliveryItems));
+	}
+}
+
+void AAirShip::OnItemLost()
+{
+	if (m_NumDeliveryItems > 1)
+	{
+		m_NumDeliveryItems--;
+		m_NumLostItems++;
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Item Lost! Remaining: %i"), m_NumDeliveryItems));
+	}
 }
 
 void AAirShip::HandleHeading(float _deltaTime)

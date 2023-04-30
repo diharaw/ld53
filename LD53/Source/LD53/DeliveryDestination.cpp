@@ -5,6 +5,8 @@
 #include "Components/BoxComponent.h"
 #include "DeliveryItem.h"
 #include "CoalPiece.h"
+#include "AirShip.h"
+#include "LD53GameMode.h"
 
 // Sets default values
 ADeliveryDestination::ADeliveryDestination()
@@ -46,6 +48,7 @@ void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent
 	}
 	else if (OtherActor->IsA<ADeliveryItem>())
 	{
+		ALD53GameMode* GameMode = Cast<ALD53GameMode>(GetWorld()->GetAuthGameMode());
 		ADeliveryItem* DeliveryItem = Cast<ADeliveryItem>(OtherActor);
 
 		OtherActor->DisableComponentsSimulatePhysics();
@@ -53,14 +56,12 @@ void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent
 		if (DeliveryItem->DestinationID == DestinationID)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Item Delivered to Correct Destination!"));
-
-			// TODO: mark delivery item as delivered
+			GameMode->GetAirShip()->OnItemDelivered();
 		}
 		else
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Item Delivered to Incorrect Destination!"));
-
-			// TODO: mark delivery item as missed 
+			GameMode->GetAirShip()->OnItemLost();
 		}
 	}
 }

@@ -58,7 +58,7 @@ void AKillBox::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 		OtherActor->Destroy();
 
-		// TODO: mark delivery item as missed 
+		AirShip->OnItemLost();
 	}
 }
 
