@@ -11,10 +11,10 @@ class LD53_API ACoalFurnance : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	class AAirShip* AirShip;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	class ACoalSpawner* CoalSpawner;
 
 private:

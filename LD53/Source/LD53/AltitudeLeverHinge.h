@@ -13,10 +13,10 @@ class LD53_API AAltitudeLeverHinge : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	AAirShip* AirShip;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float MaxLeverHalfAngle = 60.0f;
 
 private:

@@ -11,16 +11,19 @@ class LD53_API ACoalSpawner : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float SpawnDelay = 1.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
+	float SpawnRadius = 10.0f;
+
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	int MaxCoalPieces = 10;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	class AActor* SpawnPoint;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	UClass* CoalClass;
 
 private:

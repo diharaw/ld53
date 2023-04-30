@@ -13,13 +13,13 @@ class LD53_API ASteeringWheel : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float Rotation = 0.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float Rate = 100.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	AAirShip* AirShip;
 
 public:	

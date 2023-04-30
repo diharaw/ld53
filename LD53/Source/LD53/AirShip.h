@@ -15,52 +15,66 @@ class LD53_API AAirShip : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float MaxAltitude = 500.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float MinAltitude = 100.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float TargetSpeed = 100.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float TargetHeading = 0.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float TargetAltitude = 0.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float PowerFromCoalPiece = 20.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float PowerConsumptionRate = 0.25f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float RateOfTurn = 0.25f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float RateOfClimb = 1.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	float RateOfNoPowerDescent = 1.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
+	float TimeBetweenWindDirectionChanges = 180.0f;
+
+	UPROPERTY(EditAnywhere, Category = "LD53")
+	float TimeBetweenShipFaults = 30.0f;
+
+	UPROPERTY(EditAnywhere, Category = "LD53")
+	float WindChangeProbability = 0.5f;
+
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	AActor* HeadingIndicator;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
+	AActor* WindHeadingIndicator;
+
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	ARudder* Rudder;
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	AAltitudeLeverHinge* AltitudeLeverHinge;
 
 private:
 	UStaticMeshComponent* m_Cube;
 	float m_ActualSpeed = 0.0f;
-	FRotator m_TargetHeadingRot;
 	FTimerHandle m_PowerConsumptionTimerHandle;
+	FTimerHandle m_ShipFaultTimerHandle;
+	FTimerHandle m_WindDirectionChangeTimerHandle;
 	float m_ActualAltitude = 0.0f;
 	float m_Power = 100.0f;
+	float m_WindHeading = 0.0f;
 
 public:	
 	// Sets default values for this actor's properties
@@ -99,5 +113,8 @@ private:
 	void HandleHeading(float _deltaTime);
 	void HandleMovement(float _deltaTime);
 	void HandleAltitude(float _deltaTime);
+	void HandleWindHeading(float _deltaTime);
 	void OnConsumePower();
+	void OnShipFaultGeneration();
+	void OnWindDirectionChange();
 };

@@ -77,7 +77,7 @@ void ACoalSpawner::OnSpawnCoalChunk()
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-		FVector Location = SpawnPoint->GetActorLocation();
+		FVector Location = SpawnPoint->GetActorLocation() + FVector(FMath::RandRange(-SpawnRadius, SpawnRadius), FMath::RandRange(-SpawnRadius, SpawnRadius), 0.0f);
 		FRotator Rotation = SpawnPoint->GetActorRotation();
 
 		GetWorld()->SpawnActor(CoalClass, &Location, &Rotation, SpawnInfo);

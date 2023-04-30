@@ -26,7 +26,8 @@ void AAirShip::BeginPlay()
 	Super::BeginPlay();
 	
 	GetWorld()->GetTimerManager().SetTimer(m_PowerConsumptionTimerHandle, this, &AAirShip::OnConsumePower, 1.0f, true);
-	//m_Cube = FindComponentByClass< UStaticMeshComponent>();
+	GetWorld()->GetTimerManager().SetTimer(m_WindDirectionChangeTimerHandle, this, &AAirShip::OnWindDirectionChange, TimeBetweenWindDirectionChanges, true);
+	GetWorld()->GetTimerManager().SetTimer(m_ShipFaultTimerHandle, this, &AAirShip::OnShipFaultGeneration, TimeBetweenShipFaults, true);
 }
 
 void AAirShip::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -34,6 +35,8 @@ void AAirShip::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 
 	GetWorld()->GetTimerManager().ClearTimer(m_PowerConsumptionTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(m_WindDirectionChangeTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(m_ShipFaultTimerHandle);
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 }
 
@@ -45,6 +48,7 @@ void AAirShip::Tick(float DeltaTime)
 	HandleHeading(DeltaTime);
 	HandleAltitude(DeltaTime);
 	HandleMovement(DeltaTime);
+	HandleWindHeading(DeltaTime);
 }
 
 void AAirShip::UpdateTargetSpeed(float _speed)
@@ -87,15 +91,14 @@ float AAirShip::GetTargetAltitudeNormalized()
 
 void AAirShip::HandleHeading(float _deltaTime)
 {
-	FRotator rotation = GetActorRotation();
+	FRotator ShipRotation = GetActorRotation();
 
-	float ActualTargetHeading = HasPower() ? TargetHeading : rotation.Yaw;
+	float ActualTargetHeading = HasPower() ? TargetHeading : ShipRotation.Yaw;
+	FRotator TargetHeadingRot = FRotator(0.0f, ActualTargetHeading, 0.0f);
 
-	m_TargetHeadingRot = FRotator(0.0f, ActualTargetHeading, 0.0f);
+	FRotator FinalRotation = FRotator(FQuat::Slerp(ShipRotation.Quaternion(), TargetHeadingRot.Quaternion(), _deltaTime * RateOfTurn));
 
-	rotation = FRotator(FQuat::Slerp(rotation.Quaternion(), m_TargetHeadingRot.Quaternion(), _deltaTime * RateOfTurn));
-
-	SetActorRotation(rotation);
+	SetActorRotation(FinalRotation);
 
 	if (HeadingIndicator)
 	{
@@ -108,7 +111,7 @@ void AAirShip::HandleHeading(float _deltaTime)
 
 	if (Rudder)
 	{
-		float diff = GetAngleDifferenceClockwise(ActualTargetHeading, rotation.Yaw);
+		float diff = GetAngleDifferenceClockwise(ActualTargetHeading, FinalRotation.Yaw);
 
 		FRotator rudderRotation = FRotator(0.0f, FMath::Clamp(-diff, -60.0f, 60.0f), 0.0f);
 
@@ -141,10 +144,39 @@ void AAirShip::HandleAltitude(float _deltaTime)
 	SetActorLocation(position);
 }
 
+void AAirShip::HandleWindHeading(float _deltaTime)
+{
+	if (WindHeadingIndicator)
+	{
+		FRotator WindHeadingRotation = WindHeadingIndicator->GetActorRotation();
+		FRotator TargetWindHeadingRotation = FRotator(0.0f, m_WindHeading, 0.0f);
+
+		FRotator FinalRotation = FRotator(FQuat::Slerp(WindHeadingRotation.Quaternion(), TargetWindHeadingRotation.Quaternion(), _deltaTime));
+
+		WindHeadingIndicator->SetActorRotation(FinalRotation);
+	}
+}
+
 void AAirShip::OnConsumePower()
 {
 	m_Power -= PowerConsumptionRate;
 	m_Power = FMath::Clamp(m_Power, 0.0f, 100.0f);
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Ship Power: %f"), m_Power));
+}
+
+void AAirShip::OnShipFaultGeneration()
+{
+
+}
+
+void AAirShip::OnWindDirectionChange()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Current Wind Heading: %f Degrees"), m_WindHeading));
+
+	if (FMath::RandRange(0.0f, 1.0f) < WindChangeProbability)
+	{
+		m_WindHeading = FMath::RandRange(0.0f, 359.0f);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Wind Heading Changed: %f Degrees"), m_WindHeading));
+	}
 }

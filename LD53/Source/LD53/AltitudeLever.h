@@ -13,7 +13,7 @@ class LD53_API AAltitudeLever : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "Members")
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	AAltitudeLeverHinge* AltitudeLeverHinge;
 
 public:	
