@@ -103,7 +103,7 @@ protected:
 
 public:	
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float _DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void UpdateTargetSpeed(float _speed);
@@ -133,16 +133,19 @@ public:
 	float GetTargetAltitudeNormalized();
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
+	int GetNumDeliveryItems();
+
+	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void OnItemDelivered();
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void OnItemLost();
 
 private:
-	void HandleHeading(float _deltaTime);
-	void HandleMovement(float _deltaTime);
-	void HandleAltitude(float _deltaTime);
-	void HandleWindHeading(float _deltaTime);
+	void HandleHeading(float _DeltaTime);
+	void HandleMovement(float _DeltaTime);
+	void HandleAltitude(float _DeltaTime);
+	void HandleWindHeading(float _DeltaTime);
 	void OnConsumePower();
 	void OnShipFaultGeneration();
 	void OnWindDirectionChange();

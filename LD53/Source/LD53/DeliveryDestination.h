@@ -11,7 +11,7 @@ class LD53_API ADeliveryDestination : public AActor
 {
 	GENERATED_BODY()
 
-public:
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	int DestinationID = 0;
 
 private:
@@ -35,4 +35,7 @@ private:
 
 	UFUNCTION()
 	void OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION(BlueprintCallable, Category = "LD53 Altitude Lever")
+	int GetDestinationID();
 };

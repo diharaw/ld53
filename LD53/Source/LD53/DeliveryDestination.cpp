@@ -53,7 +53,7 @@ void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent
 
 		OtherActor->DisableComponentsSimulatePhysics();
 
-		if (DeliveryItem->DestinationID == DestinationID)
+		if (DeliveryItem->GetDestinationID() == DestinationID)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Item Delivered to Correct Destination!"));
 			GameMode->GetAirShip()->OnItemDelivered();
@@ -69,4 +69,9 @@ void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent
 void ADeliveryDestination::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 
+}
+
+int ADeliveryDestination::GetDestinationID()
+{
+	return DestinationID;
 }

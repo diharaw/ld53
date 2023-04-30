@@ -13,7 +13,7 @@ class LD53_API APickUppable : public AActor
 {
 	GENERATED_BODY()
 	
-private:
+protected:
 	UStaticMeshComponent* m_Mesh = nullptr;
 
 public:	

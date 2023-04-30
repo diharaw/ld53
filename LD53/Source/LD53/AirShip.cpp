@@ -43,24 +43,24 @@ void AAirShip::EndPlay(const EEndPlayReason::Type EndPlayReason)
 }
 
 // Called every frame
-void AAirShip::Tick(float DeltaTime)
+void AAirShip::Tick(float _DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(_DeltaTime);
 
-	HandleHeading(DeltaTime);
-	HandleAltitude(DeltaTime);
-	HandleMovement(DeltaTime);
-	HandleWindHeading(DeltaTime);
+	HandleHeading(_DeltaTime);
+	HandleAltitude(_DeltaTime);
+	HandleMovement(_DeltaTime);
+	HandleWindHeading(_DeltaTime);
 }
 
-void AAirShip::UpdateTargetSpeed(float _speed)
+void AAirShip::UpdateTargetSpeed(float _Speed)
 {
-	TargetSpeed = _speed;
+	TargetSpeed = _Speed;
 }
 
-void AAirShip::UpdateTargetHeading(float _heading)
+void AAirShip::UpdateTargetHeading(float _Heading)
 {
-	TargetHeading = _heading;
+	TargetHeading = _Heading;
 }
 
 void AAirShip::UpdateTargetAltitude(float _Altitude)
@@ -109,6 +109,11 @@ float AAirShip::GetTargetAltitudeNormalized()
 	return (TargetAltitude - MinAltitude) / (MaxAltitude - MinAltitude);
 }
 
+int AAirShip::GetNumDeliveryItems()
+{
+	return m_NumDeliveryItems;
+}
+
 void AAirShip::OnItemDelivered()
 {
 	if (m_NumDeliveryItems > 1)
@@ -131,14 +136,14 @@ void AAirShip::OnItemLost()
 	}
 }
 
-void AAirShip::HandleHeading(float _deltaTime)
+void AAirShip::HandleHeading(float _DeltaTime)
 {
 	FRotator ShipRotation = GetActorRotation();
 
 	float ActualTargetHeading = HasPower() ? TargetHeading : ShipRotation.Yaw;
 	FRotator TargetHeadingRot = FRotator(0.0f, ActualTargetHeading, 0.0f);
 
-	FRotator FinalRotation = FRotator(FQuat::Slerp(ShipRotation.Quaternion(), TargetHeadingRot.Quaternion(), _deltaTime * RateOfTurn));
+	FRotator FinalRotation = FRotator(FQuat::Slerp(ShipRotation.Quaternion(), TargetHeadingRot.Quaternion(), _DeltaTime * RateOfTurn));
 
 	SetActorRotation(FinalRotation);
 
@@ -161,23 +166,23 @@ void AAirShip::HandleHeading(float _deltaTime)
 	}
 }
 
-void AAirShip::HandleMovement(float _deltaTime)
+void AAirShip::HandleMovement(float _DeltaTime)
 {
-	m_ActualSpeed = FMath::Lerp(m_ActualSpeed, TargetSpeed, _deltaTime);
+	m_ActualSpeed = FMath::Lerp(m_ActualSpeed, TargetSpeed, _DeltaTime);
 
 	FVector position = GetActorLocation();
 
-	position += GetActorForwardVector() * m_ActualSpeed * GetSailEffectiveness() * _deltaTime;
+	position += GetActorForwardVector() * m_ActualSpeed * GetSailEffectiveness() * _DeltaTime;
 
 	SetActorLocation(position);
 }
 
-void AAirShip::HandleAltitude(float _deltaTime)
+void AAirShip::HandleAltitude(float _DeltaTime)
 {
 	float ActualRateOfClimb = HasPower() ? RateOfClimb : RateOfNoPowerDescent;
 	float ActualTargetAltitude = HasPower() ? TargetAltitude : 0.0f;
 
-	m_ActualAltitude = FMath::Lerp(m_ActualAltitude, ActualTargetAltitude, _deltaTime * ActualRateOfClimb);
+	m_ActualAltitude = FMath::Lerp(m_ActualAltitude, ActualTargetAltitude, _DeltaTime * ActualRateOfClimb);
 
 	FVector position = GetActorLocation();
 
@@ -186,14 +191,14 @@ void AAirShip::HandleAltitude(float _deltaTime)
 	SetActorLocation(position);
 }
 
-void AAirShip::HandleWindHeading(float _deltaTime)
+void AAirShip::HandleWindHeading(float _DeltaTime)
 {
 	if (WindHeadingIndicator)
 	{
 		FRotator WindHeadingRotation = WindHeadingIndicator->GetActorRotation();
 		FRotator TargetWindHeadingRotation = FRotator(0.0f, m_WindHeading, 0.0f);
 
-		FRotator FinalRotation = FRotator(FQuat::Slerp(WindHeadingRotation.Quaternion(), TargetWindHeadingRotation.Quaternion(), _deltaTime));
+		FRotator FinalRotation = FRotator(FQuat::Slerp(WindHeadingRotation.Quaternion(), TargetWindHeadingRotation.Quaternion(), _DeltaTime));
 
 		WindHeadingIndicator->SetActorRotation(FinalRotation);
 	}
