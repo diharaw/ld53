@@ -18,7 +18,7 @@ private:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "LD53 Altitude Lever")
-	void AssignIDAndColor(int _ID, FColor _Color, UMaterial* _Material);
+	void AssignIDAndColor(int _ID, FColor _Color, UMaterialInstance* _Material);
 
 	UFUNCTION(BlueprintCallable, Category = "LD53 Altitude Lever")
 	int GetDestinationID();

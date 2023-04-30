@@ -114,6 +114,11 @@ int AAirShip::GetNumDeliveryItems()
 	return m_NumDeliveryItems;
 }
 
+int AAirShip::GetNumTotalDeliveryItems()
+{
+	return NumTotalDeliveryItems;
+}
+
 void AAirShip::OnItemDelivered()
 {
 	if (m_NumDeliveryItems > 1)

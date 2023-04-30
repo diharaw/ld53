@@ -6,25 +6,27 @@
 #include "GameFramework/Actor.h"
 #include "DeliveryItemSpawner.generated.h"
 
+class AAirShip;
+
 UCLASS()
 class LD53_API ADeliveryItemSpawner : public AActor
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
+	AAirShip* AirShip;
+
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	UClass* DeliveryItemClass;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
-	UMaterial* DeliveryItemMaterial;
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
-	class AActor* SpawnPoint;
+	UMaterialInstance* DeliveryItemMaterial;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	float SpawnRadius = 10.0f;
 
 private:
-	class UBoxComponent* m_TriggerVolume = nullptr;
+	bool m_HasSpawned = false;
 
 public:	
 	// Sets default values for this actor's properties

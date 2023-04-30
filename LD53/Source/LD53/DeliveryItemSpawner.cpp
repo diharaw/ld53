@@ -10,7 +10,7 @@
 ADeliveryItemSpawner::ADeliveryItemSpawner()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 }
 
@@ -18,23 +18,6 @@ ADeliveryItemSpawner::ADeliveryItemSpawner()
 void ADeliveryItemSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	ALD53GameMode* GameMode = Cast<ALD53GameMode>(GetWorld()->GetAuthGameMode());
-
-	for (int i = 0; i < GameMode->GetAirShip()->GetNumDeliveryItems(); i++)
-	{
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-		FVector Location = SpawnPoint->GetActorLocation() + FVector(FMath::RandRange(-SpawnRadius, SpawnRadius), FMath::RandRange(-SpawnRadius, SpawnRadius), 0.0f);
-		FRotator Rotation = SpawnPoint->GetActorRotation();
-
-		AActor* NewActor = GetWorld()->SpawnActor(DeliveryItemClass, &Location, &Rotation, SpawnInfo);
-		ADeliveryItem* DeliveryItem = Cast< ADeliveryItem>(NewActor);
-
-		if (DeliveryItem)
-			DeliveryItem->AssignIDAndColor(i, FColor::MakeRandomColor(), DeliveryItemMaterial);
-	}
 }
 
 // Called every frame
@@ -42,5 +25,24 @@ void ADeliveryItemSpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!m_HasSpawned && AirShip)
+	{
+		for (int i = 0; i < AirShip->GetNumTotalDeliveryItems(); i++)
+		{
+			FActorSpawnParameters SpawnInfo;
+			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+			FVector Location = GetActorLocation() + FVector(FMath::RandRange(-SpawnRadius, SpawnRadius), FMath::RandRange(-SpawnRadius, SpawnRadius), 0.0f);
+			FRotator Rotation = GetActorRotation();
+
+			AActor* NewActor = GetWorld()->SpawnActor(DeliveryItemClass, &Location, &Rotation, SpawnInfo);
+			ADeliveryItem* DeliveryItem = Cast< ADeliveryItem>(NewActor);
+
+			if (DeliveryItem)
+				DeliveryItem->AssignIDAndColor(i, FColor::MakeRandomColor(), DeliveryItemMaterial);
+		}
+
+		m_HasSpawned = true;
+	}
 }
 

@@ -136,6 +136,9 @@ public:
 	int GetNumDeliveryItems();
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
+	int GetNumTotalDeliveryItems();
+
+	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void OnItemDelivered();
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
