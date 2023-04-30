@@ -98,8 +98,8 @@ bool AAirShip::HasPower()
 
 float AAirShip::GetSailEffectiveness()
 {
-	//FVector WindDirection = FVector(m_WindHeading)
-	return 0.0f;
+	float AngleBetween = FMath::Clamp(GetAngleDifferenceClockwise(m_WindHeading, m_SailRotation), 0.0f, 180.0f);
+	return FMath::Clamp(1.0f - FMath::Abs(cos(FMath::DegreesToRadians(AngleBetween))), MinSailEffectiveness, 1.0f);
 }
 
 float AAirShip::GetTargetAltitudeNormalized()
@@ -143,7 +143,7 @@ void AAirShip::HandleMovement(float _deltaTime)
 
 	FVector position = GetActorLocation();
 
-	position += GetActorForwardVector() * m_ActualSpeed * _deltaTime;
+	position += GetActorForwardVector() * m_ActualSpeed * GetSailEffectiveness() * _deltaTime;
 
 	SetActorLocation(position);
 }
@@ -181,6 +181,7 @@ void AAirShip::OnConsumePower()
 	m_Power = FMath::Clamp(m_Power, 0.0f, 100.0f);
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Ship Power: %f"), m_Power));
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Sail Effectiveness: %f"), GetSailEffectiveness()));
 }
 
 void AAirShip::OnShipFaultGeneration()

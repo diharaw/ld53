@@ -58,6 +58,9 @@ class LD53_API AAirShip : public AActor
 	float SailRotationSpeed = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
+	float MinSailEffectiveness = 0.25f;
+
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	AActor* HeadingIndicator;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")

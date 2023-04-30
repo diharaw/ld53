@@ -28,7 +28,7 @@ void ASailControlWheel::Tick(float DeltaTime)
 
 	rotation.Yaw = m_Rotation;
 
-	SetActorRotation(rotation);
+	SetActorRelativeRotation(rotation);
 }
 
 void ASailControlWheel::RotateWheel(float _direction)
