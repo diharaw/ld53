@@ -25,7 +25,16 @@ void AAirShip::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GetWorld()->GetTimerManager().SetTimer(m_PowerConsumptionTimerHandle, this, &AAirShip::OnConsumePower, 1.0f, true);
 	//m_Cube = FindComponentByClass< UStaticMeshComponent>();
+}
+
+void AAirShip::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorld()->GetTimerManager().ClearTimer(m_PowerConsumptionTimerHandle);
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 }
 
 // Called every frame
@@ -66,6 +75,11 @@ void AAirShip::AddCoalPiece()
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Added Coal Piece: %f"), m_Power));
 }
 
+bool AAirShip::HasPower()
+{
+	return m_Power > 0.0f;
+}
+
 float AAirShip::GetTargetAltitudeNormalized()
 {
 	return (TargetAltitude - MinAltitude) / (MaxAltitude - MinAltitude);
@@ -73,11 +87,13 @@ float AAirShip::GetTargetAltitudeNormalized()
 
 void AAirShip::HandleHeading(float _deltaTime)
 {
-	m_TargetHeadingRot = FRotator(0.0f, TargetHeading, 0.0f);
-
 	FRotator rotation = GetActorRotation();
 
-	rotation = FRotator(FQuat::Slerp(rotation.Quaternion(), m_TargetHeadingRot.Quaternion(), _deltaTime));
+	float ActualTargetHeading = HasPower() ? TargetHeading : rotation.Yaw;
+
+	m_TargetHeadingRot = FRotator(0.0f, ActualTargetHeading, 0.0f);
+
+	rotation = FRotator(FQuat::Slerp(rotation.Quaternion(), m_TargetHeadingRot.Quaternion(), _deltaTime * RateOfTurn));
 
 	SetActorRotation(rotation);
 
@@ -92,7 +108,7 @@ void AAirShip::HandleHeading(float _deltaTime)
 
 	if (Rudder)
 	{
-		float diff = GetAngleDifferenceClockwise(TargetHeading, rotation.Yaw);
+		float diff = GetAngleDifferenceClockwise(ActualTargetHeading, rotation.Yaw);
 
 		FRotator rudderRotation = FRotator(0.0f, FMath::Clamp(-diff, -60.0f, 60.0f), 0.0f);
 
@@ -113,7 +129,10 @@ void AAirShip::HandleMovement(float _deltaTime)
 
 void AAirShip::HandleAltitude(float _deltaTime)
 {
-	m_ActualAltitude = FMath::Lerp(m_ActualAltitude, TargetAltitude, _deltaTime);
+	float ActualRateOfClimb = HasPower() ? RateOfClimb : RateOfNoPowerDescent;
+	float ActualTargetAltitude = HasPower() ? TargetAltitude : 0.0f;
+
+	m_ActualAltitude = FMath::Lerp(m_ActualAltitude, ActualTargetAltitude, _deltaTime * ActualRateOfClimb);
 
 	FVector position = GetActorLocation();
 
@@ -122,7 +141,10 @@ void AAirShip::HandleAltitude(float _deltaTime)
 	SetActorLocation(position);
 }
 
-void AAirShip::ConsumePower()
+void AAirShip::OnConsumePower()
 {
+	m_Power -= PowerConsumptionRate;
+	m_Power = FMath::Clamp(m_Power, 0.0f, 100.0f);
 
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Ship Power: %f"), m_Power));
 }

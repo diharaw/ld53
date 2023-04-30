@@ -14,6 +14,9 @@ class LD53_API ACoalFurnance : public AActor
 	UPROPERTY(EditAnywhere, Category = "Members")
 	class AAirShip* AirShip;
 
+	UPROPERTY(EditAnywhere, Category = "Members")
+	class ACoalSpawner* CoalSpawner;
+
 private:
 	class UBoxComponent* m_TriggerVolume = nullptr;
 	

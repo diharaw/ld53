@@ -4,6 +4,7 @@
 #include "CoalFurnance.h"
 #include "Components/BoxComponent.h"
 #include "CoalPiece.h"
+#include "CoalSpawner.h"
 #include "AirShip.h"
 
 // Sets default values
@@ -49,6 +50,9 @@ void ACoalFurnance::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 			AirShip->AddCoalPiece();
 
 		OtherActor->Destroy();
+
+		if (CoalSpawner)
+			CoalSpawner->DecreaseNumCoalChunks();
 	}
 }
 

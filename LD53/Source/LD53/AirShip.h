@@ -34,7 +34,16 @@ class LD53_API AAirShip : public AActor
 	float PowerFromCoalPiece = 20.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Members")
-	float PowerConsumptionRate = 5.0f;
+	float PowerConsumptionRate = 0.25f;
+
+	UPROPERTY(EditAnywhere, Category = "Members")
+	float RateOfTurn = 0.25f;
+
+	UPROPERTY(EditAnywhere, Category = "Members")
+	float RateOfClimb = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Members")
+	float RateOfNoPowerDescent = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Members")
 	AActor* HeadingIndicator;
@@ -49,6 +58,7 @@ private:
 	UStaticMeshComponent* m_Cube;
 	float m_ActualSpeed = 0.0f;
 	FRotator m_TargetHeadingRot;
+	FTimerHandle m_PowerConsumptionTimerHandle;
 	float m_ActualAltitude = 0.0f;
 	float m_Power = 100.0f;
 
@@ -59,6 +69,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	// Called every frame
@@ -79,11 +90,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LD53 AirShip")
 	void AddCoalPiece();
 
+	UFUNCTION(BlueprintCallable, Category = "LD53 AirShip")
+	bool HasPower();
+
 	float GetTargetAltitudeNormalized();
 
 private:
 	void HandleHeading(float _deltaTime);
 	void HandleMovement(float _deltaTime);
 	void HandleAltitude(float _deltaTime);
-	void ConsumePower();
+	void OnConsumePower();
 };
