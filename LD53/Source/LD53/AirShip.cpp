@@ -79,9 +79,27 @@ void AAirShip::AddCoalPiece()
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Added Coal Piece: %f"), m_Power));
 }
 
+void AAirShip::RotateSail(float _Direction)
+{
+	if (Sail)
+	{
+		m_SailRotation += GetWorld()->GetDeltaSeconds() * _Direction * SailRotationSpeed;
+
+		FRotator SailRotation = FRotator(0.0f, m_SailRotation, 0.0f);
+
+		Sail->SetActorRelativeRotation(SailRotation.Quaternion());
+	}
+}
+
 bool AAirShip::HasPower()
 {
 	return m_Power > 0.0f;
+}
+
+float AAirShip::GetSailEffectiveness()
+{
+	//FVector WindDirection = FVector(m_WindHeading)
+	return 0.0f;
 }
 
 float AAirShip::GetTargetAltitudeNormalized()

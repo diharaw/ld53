@@ -11,6 +11,7 @@ class UCameraComponent;
 class UPhysicsConstraintComponent;
 class UStaticMeshComponent;
 class ASteeringWheel;
+class ASailControlWheel;
 class AAltitudeLever;
 class APickUppable;
 
@@ -56,6 +57,7 @@ class LD53_API AFPSCharacter : public ACharacter
 private:
 	APickUppable* m_PickedUpObject = nullptr;
 	ASteeringWheel* m_SteeringWheel = nullptr;
+	ASailControlWheel* m_SailControlWheel = nullptr;
 	AAltitudeLever* m_AltitudeLever = nullptr;
 	AActor* m_HitActor = nullptr;
 	FVector m_HitPoint = FVector::ZeroVector;

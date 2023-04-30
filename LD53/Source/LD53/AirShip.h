@@ -55,10 +55,16 @@ class LD53_API AAirShip : public AActor
 	float WindChangeProbability = 0.5f;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
+	float SailRotationSpeed = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "LD53")
 	AActor* HeadingIndicator;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	AActor* WindHeadingIndicator;
+
+	UPROPERTY(EditAnywhere, Category = "LD53")
+	AActor* Sail;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	ARudder* Rudder;
@@ -75,6 +81,7 @@ private:
 	float m_ActualAltitude = 0.0f;
 	float m_Power = 100.0f;
 	float m_WindHeading = 0.0f;
+	float m_SailRotation = 0.0f;
 
 public:	
 	// Sets default values for this actor's properties
@@ -89,24 +96,31 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, Category = "LD53 AirShip")
+	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void UpdateTargetSpeed(float _speed);
 
-	UFUNCTION(BlueprintCallable, Category = "LD53 AirShip")
+	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void UpdateTargetHeading(float _heading);
 
-	UFUNCTION(BlueprintCallable, Category = "LD53 AirShip")
+	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void UpdateTargetAltitude(float _Altitude);
 
-	UFUNCTION(BlueprintCallable, Category = "LD53 AirShip")
+	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void UpdateTargetAltitudeNormalized(float _NormalizedAltitude);
 
-	UFUNCTION(BlueprintCallable, Category = "LD53 AirShip")
+	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void AddCoalPiece();
 
-	UFUNCTION(BlueprintCallable, Category = "LD53 AirShip")
+	UFUNCTION(BlueprintCallable, Category = "LD53")
+	void RotateSail(float _Direction);
+
+	UFUNCTION(BlueprintCallable, Category = "LD53")
 	bool HasPower();
 
+	UFUNCTION(BlueprintCallable, Category = "LD53")
+	float GetSailEffectiveness();
+
+	UFUNCTION(BlueprintCallable, Category = "LD53")
 	float GetTargetAltitudeNormalized();
 
 private:

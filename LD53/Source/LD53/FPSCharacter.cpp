@@ -10,6 +10,7 @@
 #include "SteeringWheel.h"
 #include "AltitudeLever.h"
 #include "PickUppable.h"
+#include "SailControlWheel.h"
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
@@ -91,6 +92,11 @@ void AFPSCharacter::Interact()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Steering Mode"));
 		m_SteeringWheel = nullptr;
 	}
+	else if (m_SailControlWheel)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Sail Control Mode"));
+		m_SailControlWheel = nullptr;
+	}
 	else if (m_AltitudeLever)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Altitude Mode"));
@@ -104,6 +110,11 @@ void AFPSCharacter::Interact()
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Steering Mode"));
 				m_SteeringWheel = Cast<ASteeringWheel>(m_HitActor);
+			}
+			else if (m_HitActor->IsA<ASailControlWheel>())
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Sail Control Mode"));
+				m_SailControlWheel = Cast<ASailControlWheel>(m_HitActor);
 			}
 			else if (m_HitActor->IsA<AAltitudeLever>())
 			{
@@ -142,6 +153,11 @@ void AFPSCharacter::Move(const FInputActionValue& Value)
 			if (m_SteeringWheel)
 			{
 				m_SteeringWheel->RotateWheel(MovementVector.X);
+				return;
+			}
+			else if (m_SailControlWheel)
+			{
+				m_SailControlWheel->RotateWheel(MovementVector.X);
 				return;
 			}
 			else if (m_AltitudeLever)

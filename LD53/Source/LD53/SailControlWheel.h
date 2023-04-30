@@ -4,27 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SteeringWheel.generated.h"
-
-class AAirShip;
+#include "SailControlWheel.generated.h"
 
 UCLASS()
-class LD53_API ASteeringWheel : public AActor
+class LD53_API ASailControlWheel : public AActor
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
-	float Rotation = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	float Rate = 100.0f;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
-	AAirShip* AirShip;
+	class AAirShip* AirShip;
+
+private:
+	float m_Rotation = 0.0f;
 
 public:	
 	// Sets default values for this actor's properties
-	ASteeringWheel();
+	ASailControlWheel();
 
 protected:
 	// Called when the game starts or when spawned
