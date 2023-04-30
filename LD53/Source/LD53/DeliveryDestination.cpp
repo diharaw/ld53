@@ -39,6 +39,26 @@ void ADeliveryDestination::Tick(float DeltaTime)
 
 }
 
+void ADeliveryDestination::AssignIDAndColor(int _ID, FColor _Color, UMaterialInstance* _Material)
+{
+	m_DestinationID = _ID;
+	m_Mesh = FindComponentByClass<UStaticMeshComponent>();
+
+	if (m_Mesh && _Material)
+	{
+		UMaterialInstanceDynamic* DynamicMaterialInst = UMaterialInstanceDynamic::Create(_Material, m_Mesh);
+
+		DynamicMaterialInst->SetVectorParameterValue("Colour", _Color);
+
+		m_Mesh->SetMaterial(0, DynamicMaterialInst);
+	}
+}
+
+int ADeliveryDestination::GetDestinationID()
+{
+	return m_DestinationID;
+}
+
 void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Overlapped!"));
@@ -53,7 +73,7 @@ void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent
 
 		OtherActor->DisableComponentsSimulatePhysics();
 
-		if (DeliveryItem->GetDestinationID() == DestinationID)
+		if (DeliveryItem->GetDestinationID() == m_DestinationID)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Item Delivered to Correct Destination!"));
 			GameMode->GetAirShip()->OnItemDelivered();
@@ -69,9 +89,4 @@ void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent
 void ADeliveryDestination::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 
-}
-
-int ADeliveryDestination::GetDestinationID()
-{
-	return DestinationID;
 }

@@ -23,10 +23,10 @@ class LD53_API ADeliveryItemSpawner : public AActor
 	UMaterialInstance* DeliveryItemMaterial;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
-	float SpawnRadius = 10.0f;
+	UMaterialInstance* DeliveryMarkerMaterial;
 
-private:
-	bool m_HasSpawned = false;
+	UPROPERTY(EditAnywhere, Category = "LD53")
+	float SpawnRadius = 10.0f;
 
 public:	
 	// Sets default values for this actor's properties

@@ -11,10 +11,9 @@ class LD53_API ADeliveryDestination : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "LD53")
-	int DestinationID = 0;
-
 private:
+	int m_DestinationID = 0;
+	class UStaticMeshComponent* m_Mesh = nullptr;
 	class UBoxComponent* m_TriggerVolume = nullptr;
 
 public:	
@@ -29,13 +28,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable, Category = "LD53 Altitude Lever")
+	void AssignIDAndColor(int _ID, FColor _Color, UMaterialInstance* _Material);
+
+	UFUNCTION(BlueprintCallable, Category = "LD53 Altitude Lever")
+	int GetDestinationID();
+
 private:
 	UFUNCTION()
 	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UFUNCTION(BlueprintCallable, Category = "LD53 Altitude Lever")
-	int GetDestinationID();
 };

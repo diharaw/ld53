@@ -6,15 +6,13 @@
 #include "GameFramework/Actor.h"
 #include "PickUppable.generated.h"
 
-class UStaticMeshComponent;
-
 UCLASS()
 class LD53_API APickUppable : public AActor
 {
 	GENERATED_BODY()
 	
 protected:
-	UStaticMeshComponent* m_Mesh = nullptr;
+	class UStaticMeshComponent* m_Mesh = nullptr;
 
 public:	
 	// Sets default values for this actor's properties
