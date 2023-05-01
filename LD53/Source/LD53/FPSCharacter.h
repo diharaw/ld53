@@ -45,9 +45,16 @@ class LD53_API AFPSCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ThrowAction;
 
+	/** Pause Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* PauseAction;
+
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	UUserWidget* PauseMenu;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	float MaxTraceDistance = 100.0f;
@@ -82,6 +89,9 @@ protected:
 
 	/** Called for throw input */
 	void ThrowRelease();
+
+	/** Called for pause input */
+	void Pause();
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);

@@ -12,6 +12,7 @@
 #include "PickUppable.h"
 #include "SailControlWheel.h"
 #include "FireExtinguisher.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
@@ -69,6 +70,9 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Started, this, &AFPSCharacter::Throw);
 		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Completed, this, &AFPSCharacter::ThrowRelease);
 
+		//Pause
+		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &AFPSCharacter::Pause);
+		
 		//Interacting
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AFPSCharacter::Interact);
 
@@ -152,6 +156,15 @@ void AFPSCharacter::ThrowRelease()
 {
 	if (m_FireExtinguisher)
 		m_FireExtinguisher->Deactivate();
+}
+
+void AFPSCharacter::Pause()
+{
+	GetWorld()->GetFirstPlayerController()->SetPause(true);
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+
+	PauseMenu->AddToViewport();
 }
 
 void AFPSCharacter::Move(const FInputActionValue& Value)
