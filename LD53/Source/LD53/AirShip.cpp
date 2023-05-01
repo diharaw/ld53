@@ -35,6 +35,9 @@ void AAirShip::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(m_ShipFaultTimerHandle, this, &AAirShip::OnShipFaultGeneration, TimeBetweenShipFaults, true);
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAirShipEngine::StaticClass(), m_Engines);
+
+	m_ActualAltitude = TargetAltitude;
+	m_ActualSpeed = TargetSpeed;
 }
 
 void AAirShip::EndPlay(const EEndPlayReason::Type EndPlayReason)

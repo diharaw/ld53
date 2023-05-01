@@ -14,9 +14,6 @@ class LD53_API ADeliveryItemSpawner : public AActor
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
-	AAirShip* AirShip;
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
 	UClass* DeliveryItemClass;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
@@ -27,6 +24,9 @@ class LD53_API ADeliveryItemSpawner : public AActor
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	float SpawnRadius = 10.0f;
+
+private:
+	AAirShip* m_AirShip = nullptr;
 
 public:	
 	// Sets default values for this actor's properties

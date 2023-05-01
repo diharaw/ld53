@@ -6,6 +6,7 @@
 #include "CoalPiece.h"
 #include "CoalSpawner.h"
 #include "AirShip.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ACoalFurnance::ACoalFurnance()
@@ -29,6 +30,18 @@ void ACoalFurnance::BeginPlay()
 		m_TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &ACoalFurnance::OverlapBegin);
 		m_TriggerVolume->OnComponentEndOverlap.AddDynamic(this, &ACoalFurnance::OverlapEnd);
 	}
+
+	TArray<AActor*> AirShips;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAirShip::StaticClass(), AirShips);
+
+	TArray<AActor*> CoalSpawners;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACoalSpawner::StaticClass(), CoalSpawners);
+
+	if (AirShips.Num() > 0)
+		m_AirShip = Cast<AAirShip>(AirShips[0]);
+
+	if (CoalSpawners.Num() > 0)
+		m_CoalSpawner = Cast<ACoalSpawner>(CoalSpawners[0]);
 }
 
 // Called every frame
@@ -46,13 +59,13 @@ void ACoalFurnance::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Found Coal Piece"));
 
-		if (AirShip)
-			AirShip->AddCoalPiece();
+		if (m_AirShip)
+			m_AirShip->AddCoalPiece();
 
 		OtherActor->Destroy();
 
-		if (CoalSpawner)
-			CoalSpawner->DecreaseNumCoalChunks();
+		if (m_CoalSpawner)
+			m_CoalSpawner->DecreaseNumCoalChunks();
 	}
 }
 
