@@ -59,7 +59,7 @@ void AKillBox::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 	if (OtherActor->IsA<ACoalPiece>())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Coal Piece Killed Off"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Coal Piece Killed Off"));
 
 		OtherActor->Destroy();
 
@@ -76,7 +76,7 @@ void AKillBox::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	}
 	else if (OtherActor->IsA<ADeliveryItem>())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Delivery Item Killed Off"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Delivery Item Killed Off"));
 
 		OtherActor->Destroy();
 

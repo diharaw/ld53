@@ -19,6 +19,7 @@
 #include "Sound/SoundCue.h"
 #include "Sound/SoundWave.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
@@ -55,6 +56,12 @@ void AFPSCharacter::BeginPlay()
 
 	if (InGameHUD)
 		InGameHUD->AddToViewport();
+
+	TArray<AActor*> AirShips;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAirShip::StaticClass(), AirShips);
+
+	if (AirShips.Num() > 0)
+		Cast<AAirShip>(AirShips[0])->SetHUD(InGameHUD);
 }
 
 // Called every frame
@@ -87,6 +94,8 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFPSCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &AFPSCharacter::MoveStarted);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AFPSCharacter::MoveEnded);
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFPSCharacter::Look);
@@ -95,7 +104,7 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void AFPSCharacter::Interact()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Interact"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Interact"));
 
 	if (m_PickedUpObject)
 	{
@@ -114,21 +123,21 @@ void AFPSCharacter::Interact()
 	}
 	else if (m_SteeringWheel)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Steering Mode"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Steering Mode"));
 		m_SteeringWheel = nullptr;
 
 		HidePrimaryPrompt();
 	}
 	else if (m_SailControlWheel)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Sail Control Mode"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Sail Control Mode"));
 		m_SailControlWheel = nullptr;
 
 		HidePrimaryPrompt();
 	}
 	else if (m_AltitudeLever)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Altitude Mode"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Altitude Mode"));
 		m_AltitudeLever = nullptr;
 
 		HidePrimaryPrompt();
@@ -139,7 +148,7 @@ void AFPSCharacter::Interact()
 		{
 			if (m_HitActor->IsA<ASteeringWheel>())
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Steering Mode"));
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Steering Mode"));
 				m_SteeringWheel = Cast<ASteeringWheel>(m_HitActor);
 
 				HidePrimaryPrompt();
@@ -147,7 +156,7 @@ void AFPSCharacter::Interact()
 			}
 			else if (m_HitActor->IsA<ASailControlWheel>())
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Sail Control Mode"));
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Sail Control Mode"));
 				m_SailControlWheel = Cast<ASailControlWheel>(m_HitActor);
 
 				HidePrimaryPrompt();
@@ -155,7 +164,7 @@ void AFPSCharacter::Interact()
 			}
 			else if (m_HitActor->IsA<AAltitudeLever>())
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Altitude Mode"));
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Altitude Mode"));
 				m_AltitudeLever = Cast<AAltitudeLever>(m_HitActor);
 
 				HidePrimaryPrompt();
@@ -163,7 +172,7 @@ void AFPSCharacter::Interact()
 			}
 			else if (m_HitActor->IsA<APickUppable>())
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Pick Up Mode"));
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Pick Up Mode"));
 				m_PickedUpObject = Cast<APickUppable>(m_HitActor);
 				
 				GrabObject();
@@ -177,6 +186,11 @@ void AFPSCharacter::Interact()
 				}
 				else
 					ShowThrowPrompt();
+			}
+			else
+			{
+				HidePrimaryPrompt();
+				HideSecondaryPrompt();
 			}
 		}
 	}
@@ -242,6 +256,27 @@ void AFPSCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
+void AFPSCharacter::MoveStarted()
+{
+	if (FootstepsCue)
+	{
+		if (!m_AudioComponent)
+			m_AudioComponent = UGameplayStatics::SpawnSound2D(this, FootstepsCue, 0.5f);
+
+		if (!m_AudioComponent->IsPlaying())
+			m_AudioComponent->Play();
+	}
+}
+
+void AFPSCharacter::MoveEnded()
+{
+	if (m_AudioComponent)
+	{
+		m_AudioComponent->Stop();
+		m_AudioComponent = nullptr;
+	}
+}
+
 void AFPSCharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -252,7 +287,7 @@ void AFPSCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		if (m_AltitudeLever)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Altitude Offset: %f"), LookAxisVector.Y));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Altitude Offset: %f"), LookAxisVector.Y));
 			m_AltitudeLever->MoveLever(-LookAxisVector.Y * 10.0f);
 		}
 		

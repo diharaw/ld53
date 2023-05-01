@@ -12,6 +12,7 @@ class ARudder;
 class ASail;
 class AHeadingIndicator;
 class AWindHeadingIndicator;
+class UHUDUserWidget;
 
 UENUM(BlueprintType)
 enum class EGameOverReason : uint8 {
@@ -76,6 +77,12 @@ class LD53_API AAirShip : public AActor
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
 	class UGameOverUserWidget* GameOverMenu;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	class USoundCue* SuccessCue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	class USoundCue* FailureCue;
+
 private:
 	UStaticMeshComponent* m_Cube;
 	float m_ActualSpeed = 0.0f;
@@ -95,6 +102,8 @@ private:
 	int m_NumRemainingDeliveryItems = 0;
 	int m_NumDeliveredItems = 0;
 	int m_NumLostItems = 0;
+	UHUDUserWidget* m_HUD = nullptr;
+	class UAudioComponent* m_AudioComponent = nullptr;
 
 	bool m_SetFire = false;
 
@@ -110,6 +119,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float _DeltaTime) override;
+
+	void SetHUD(UHUDUserWidget* _HUD);
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void UpdateTargetSpeed(float _speed);

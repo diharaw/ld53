@@ -59,6 +59,9 @@ class LD53_API AFPSCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
 	class UHUDUserWidget* InGameHUD;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	class USoundCue* FootstepsCue;
+
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	float MaxTraceDistance = 100.0f;
 
@@ -75,6 +78,8 @@ private:
 	FVector m_HitPoint = FVector::ZeroVector;
 	UStaticMeshComponent* m_GrabSlotMesh = nullptr;
 	UPhysicsConstraintComponent* m_GrabConstraint = nullptr;
+	UAudioComponent* m_AudioComponent = nullptr;
+	bool m_IsMoving = false;
 
 public:
 	// Sets default values for this character's properties
@@ -98,6 +103,9 @@ protected:
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
+
+	void MoveStarted();
+	void MoveEnded();
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);

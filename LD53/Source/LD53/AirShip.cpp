@@ -10,6 +10,9 @@
 #include "AltitudeLeverHinge.h"
 #include "HeadingIndicator.h"
 #include "WindHeadingIndicator.h"
+#include "HUDUserWidget.h"
+#include "Sound/SoundCue.h"
+#include "Components/AudioComponent.h"
 
 float GetAngleDifferenceClockwise(float from, float to)
 {
@@ -67,6 +70,9 @@ void AAirShip::BeginPlay()
 
 	m_ActualAltitude = TargetAltitude;
 	m_ActualSpeed = TargetSpeed;
+
+	m_AudioComponent = FindComponentByClass<UAudioComponent>();
+	m_AudioComponent->Stop();
 }
 
 void AAirShip::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -88,6 +94,11 @@ void AAirShip::Tick(float _DeltaTime)
 	HandleAltitude(_DeltaTime);
 	HandleMovement(_DeltaTime);
 	//HandleWindHeading(_DeltaTime);
+}
+
+void AAirShip::SetHUD(UHUDUserWidget* _HUD)
+{
+	m_HUD = _HUD;
 }
 
 void AAirShip::UpdateTargetSpeed(float _Speed)
@@ -115,7 +126,9 @@ void AAirShip::AddCoalPiece()
 	m_Power += PowerFromCoalPiece;
 	m_Power = FMath::Clamp(m_Power, 0.0f, 100.0f);
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Added Coal Piece: %f"), m_Power));
+	if (m_AudioComponent->IsPlaying())
+		m_AudioComponent->Stop();
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Added Coal Piece: %f"), m_Power));
 }
 
 void AAirShip::RotateSail(float _Direction)
@@ -201,7 +214,15 @@ void AAirShip::OnItemDelivered()
 		m_NumRemainingDeliveryItems--;
 		m_NumDeliveredItems++;
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Item Delivered! Remaining: %i"), m_NumRemainingDeliveryItems));
+		if (FailureCue)
+		{
+			UAudioComponent* AudioComponent = UGameplayStatics::SpawnSound2D(this, SuccessCue, 1.0f);
+
+			if (AudioComponent)
+				AudioComponent->Play();
+		}
+
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Item Delivered! Remaining: %i"), m_NumRemainingDeliveryItems));
 
 		if (m_NumRemainingDeliveryItems == 0)
 			OnNoMoreItemsRemaining();
@@ -220,7 +241,15 @@ void AAirShip::OnItemLost()
 		m_NumRemainingDeliveryItems--;
 		m_NumLostItems++;
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Item Lost! Remaining: %i"), m_NumRemainingDeliveryItems));
+		if (FailureCue)
+		{
+			UAudioComponent* AudioComponent = UGameplayStatics::SpawnSound2D(this, FailureCue, 1.0f);
+
+			if (AudioComponent)
+				AudioComponent->Play();
+		}
+
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Item Lost! Remaining: %i"), m_NumRemainingDeliveryItems));
 
 		if (m_NumRemainingDeliveryItems == 0)
 			OnNoMoreItemsRemaining();
@@ -300,7 +329,16 @@ void AAirShip::OnConsumePower()
 	m_Power -= PowerConsumptionRate;
 	m_Power = FMath::Clamp(m_Power, 0.0f, 100.0f);
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Ship Power: %f"), m_Power));
+	if (m_Power == 0.0f)
+	{
+		m_HUD->UpdatePowerLevelText(FString::Printf(TEXT("Ship Power: %f [Loosing Altitude]"), m_Power));
+
+		if (!m_AudioComponent->IsPlaying())
+			m_AudioComponent->Play();
+	}
+	else
+		m_HUD->UpdatePowerLevelText(FString::Printf(TEXT("Ship Power: %f"), m_Power));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Ship Power: %f"), m_Power));
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Sail Effectiveness: %f"), GetSailEffectiveness()));
 }
 

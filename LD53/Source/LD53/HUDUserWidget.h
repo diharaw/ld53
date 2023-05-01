@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	class UTextBlock* txtSecondary;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	class UTextBlock* txtPowerLevel;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void ShowPrimaryPrompt(FString _Text);
@@ -44,4 +47,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void HideSecondaryPrompt();
+
+	UFUNCTION(BlueprintCallable, Category = "LD53")
+	void UpdatePowerLevelText(FString _Text);
 };

@@ -7,6 +7,8 @@
 #include "CoalPiece.h"
 #include "AirShip.h"
 #include "LD53GameMode.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 ADeliveryDestination::ADeliveryDestination()

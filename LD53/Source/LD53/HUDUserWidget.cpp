@@ -46,3 +46,9 @@ void UHUDUserWidget::HideSecondaryPrompt()
 	if (blurSecondary)
 		blurSecondary->SetVisibility(ESlateVisibility::Hidden);
 }
+
+void UHUDUserWidget::UpdatePowerLevelText(FString _Text)
+{
+	if (txtPowerLevel)
+		txtPowerLevel->SetText(FText::FromString(_Text));
+}
