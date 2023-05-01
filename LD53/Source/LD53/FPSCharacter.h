@@ -14,6 +14,7 @@ class ASteeringWheel;
 class ASailControlWheel;
 class AAltitudeLever;
 class APickUppable;
+class AFireExtinguisher;
 
 UCLASS()
 class LD53_API AFPSCharacter : public ACharacter
@@ -58,6 +59,7 @@ private:
 	APickUppable* m_PickedUpObject = nullptr;
 	ASteeringWheel* m_SteeringWheel = nullptr;
 	ASailControlWheel* m_SailControlWheel = nullptr;
+	AFireExtinguisher* m_FireExtinguisher = nullptr;
 	AAltitudeLever* m_AltitudeLever = nullptr;
 	AActor* m_HitActor = nullptr;
 	FVector m_HitPoint = FVector::ZeroVector;
@@ -77,6 +79,9 @@ protected:
 
 	/** Called for throw input */
 	void Throw();
+
+	/** Called for throw input */
+	void ThrowRelease();
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);

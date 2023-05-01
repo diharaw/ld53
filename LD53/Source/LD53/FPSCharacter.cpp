@@ -11,6 +11,7 @@
 #include "AltitudeLever.h"
 #include "PickUppable.h"
 #include "SailControlWheel.h"
+#include "FireExtinguisher.h"
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
@@ -66,6 +67,7 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 		//Throw
 		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Started, this, &AFPSCharacter::Throw);
+		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Completed, this, &AFPSCharacter::ThrowRelease);
 
 		//Interacting
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AFPSCharacter::Interact);
@@ -126,6 +128,9 @@ void AFPSCharacter::Interact()
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Pick Up Mode"));
 				m_PickedUpObject = Cast<APickUppable>(m_HitActor);
 				GrabObject();
+
+				if (m_HitActor->IsA<AFireExtinguisher>())
+					m_FireExtinguisher = Cast<AFireExtinguisher>(m_HitActor);
 			}
 		}
 	}
@@ -133,12 +138,20 @@ void AFPSCharacter::Interact()
 
 void AFPSCharacter::Throw()
 {
-	if (m_PickedUpObject)
+	if (m_FireExtinguisher)
+		m_FireExtinguisher->Activate();
+	else if (m_PickedUpObject)
 	{
 		DropObject();
 		m_PickedUpObject->Throw(FirstPersonCameraComponent->GetForwardVector() * ObjectThrowImpulse);
 		m_PickedUpObject = nullptr;
 	}
+}
+
+void AFPSCharacter::ThrowRelease()
+{
+	if (m_FireExtinguisher)
+		m_FireExtinguisher->Deactivate();
 }
 
 void AFPSCharacter::Move(const FInputActionValue& Value)
@@ -209,7 +222,7 @@ void AFPSCharacter::CheckForInteractableActor()
 	// UWorld()->LineTraceSingleByChannel runs a line trace and returns the first actor hit over the provided collision channel.
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Pawn, QueryParams);
 
-	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, Hit.bBlockingHit ? FColor::Blue : FColor::Red, false, -1.0f, 0, 1.0f);
+	//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, Hit.bBlockingHit ? FColor::Blue : FColor::Red, false, -1.0f, 0, 1.0f);
 	
 	// If the trace hit something, bBlockingHit will be true,
 	// and its fields will be filled with detailed info about what was hit
@@ -229,6 +242,7 @@ void AFPSCharacter::CheckForInteractableActor()
 
 void AFPSCharacter::GrabObject()
 {
+	m_PickedUpObject->SetActorLocationAndRotation(m_GrabSlotMesh->GetComponentLocation(), m_GrabSlotMesh->GetComponentRotation(), false, nullptr, ETeleportType::TeleportPhysics);
 	m_GrabConstraint->SetConstrainedComponents(m_GrabSlotMesh, "", m_PickedUpObject->GetMesh(), "");
 	m_PickedUpObject->GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 }

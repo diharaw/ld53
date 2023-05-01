@@ -3,6 +3,8 @@
 
 #include "AirShip.h"
 #include "Rudder.h"
+#include "AirShipEngine.h"
+#include "Kismet/GameplayStatics.h"
 
 float GetAngleDifferenceClockwise(float from, float to)
 {
@@ -30,6 +32,8 @@ void AAirShip::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(m_PowerConsumptionTimerHandle, this, &AAirShip::OnConsumePower, 1.0f, true);
 	GetWorld()->GetTimerManager().SetTimer(m_WindDirectionChangeTimerHandle, this, &AAirShip::OnWindDirectionChange, TimeBetweenWindDirectionChanges, true);
 	GetWorld()->GetTimerManager().SetTimer(m_ShipFaultTimerHandle, this, &AAirShip::OnShipFaultGeneration, TimeBetweenShipFaults, true);
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAirShipEngine::StaticClass(), m_Engines);
 }
 
 void AAirShip::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -51,6 +55,13 @@ void AAirShip::Tick(float _DeltaTime)
 	HandleAltitude(_DeltaTime);
 	HandleMovement(_DeltaTime);
 	HandleWindHeading(_DeltaTime);
+
+	if (!m_SetFire)
+	{
+		AAirShipEngine* Engine = Cast<AAirShipEngine>(m_Engines[0]);
+		Engine->SetOnFire();
+		m_SetFire = true;
+	}
 }
 
 void AAirShip::UpdateTargetSpeed(float _Speed)
@@ -214,8 +225,8 @@ void AAirShip::OnConsumePower()
 	m_Power -= PowerConsumptionRate;
 	m_Power = FMath::Clamp(m_Power, 0.0f, 100.0f);
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Ship Power: %f"), m_Power));
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Sail Effectiveness: %f"), GetSailEffectiveness()));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Ship Power: %f"), m_Power));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Sail Effectiveness: %f"), GetSailEffectiveness()));
 }
 
 void AAirShip::OnShipFaultGeneration()
@@ -225,11 +236,11 @@ void AAirShip::OnShipFaultGeneration()
 
 void AAirShip::OnWindDirectionChange()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Current Wind Heading: %f Degrees"), m_WindHeading));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Current Wind Heading: %f Degrees"), m_WindHeading));
 
 	if (FMath::RandRange(0.0f, 1.0f) < WindChangeProbability)
 	{
 		m_WindHeading = FMath::RandRange(0.0f, 359.0f);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Wind Heading Changed: %f Degrees"), m_WindHeading));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Wind Heading Changed: %f Degrees"), m_WindHeading));
 	}
 }

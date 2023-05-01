@@ -10,7 +10,11 @@ UCLASS()
 class LD53_API AAirShipEnginePanel : public AActor
 {
 	GENERATED_BODY()
-	
+
+private:
+	float m_FireHealth = 0.0f;
+	class AAirShipEngine* m_AirShipEngine = nullptr;
+
 public:	
 	// Sets default values for this actor's properties
 	AAirShipEnginePanel();
@@ -23,4 +27,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable, Category = "LD53 Altitude Lever")
+	void SetOnFire(AAirShipEngine* _AirShipEngine);
+
+	UFUNCTION(BlueprintCallable, Category = "LD53 Altitude Lever")
+	void DoFireExtinguish(float _Amount);
 };

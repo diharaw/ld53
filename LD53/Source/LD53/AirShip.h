@@ -84,6 +84,7 @@ private:
 	FTimerHandle m_PowerConsumptionTimerHandle;
 	FTimerHandle m_ShipFaultTimerHandle;
 	FTimerHandle m_WindDirectionChangeTimerHandle;
+	TArray<AActor*> m_Engines;
 	float m_ActualAltitude = 0.0f;
 	float m_Power = 100.0f;
 	float m_WindHeading = 0.0f;
@@ -91,6 +92,8 @@ private:
 	int m_NumDeliveryItems = 0;
 	int m_NumDeliveredItems = 0;
 	int m_NumLostItems = 0;
+
+	bool m_SetFire = false;
 
 public:	
 	// Sets default values for this actor's properties
