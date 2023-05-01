@@ -59,6 +59,21 @@ class LD53_API AFPSCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
 	UUserWidget* PauseMenu;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	UUserWidget* GrabPrompt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	UUserWidget* DropPrompt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	UUserWidget* RepairPrompt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	UUserWidget* ThrowPrompt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	UUserWidget* UsePrompt;
+
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	float MaxTraceDistance = 100.0f;
 
@@ -113,4 +128,19 @@ private:
 	void CheckForInteractableActor();
 	void GrabObject();
 	void DropObject();
+
+	void ShowGrabPrompt();
+	void HideGrabPrompt();
+
+	void ShowDropPrompt();
+	void HideDropPrompt();
+
+	void ShowRepairPrompt();
+	void HideRepairPrompt();
+
+	void ShowThrowPrompt();
+	void HideThrowPrompt();
+
+	void ShowUsePrompt();
+	void HideUsePrompt();
 };

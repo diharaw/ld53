@@ -94,28 +94,40 @@ void AFPSCharacter::Interact()
 	if (m_PickedUpObject)
 	{
 		DropObject();
+		HideDropPrompt();
+
 		m_PickedUpObject = nullptr;
 
 		if (m_FireExtinguisher)
 		{
 			m_FireExtinguisher->Deactivate();
 			m_FireExtinguisher = nullptr;
+
+			HideUsePrompt();
 		}
+		else
+			HideThrowPrompt();
 	}
 	else if (m_SteeringWheel)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Steering Mode"));
 		m_SteeringWheel = nullptr;
+
+		HideDropPrompt();
 	}
 	else if (m_SailControlWheel)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Sail Control Mode"));
 		m_SailControlWheel = nullptr;
+
+		HideDropPrompt();
 	}
 	else if (m_AltitudeLever)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Altitude Mode"));
 		m_AltitudeLever = nullptr;
+
+		HideDropPrompt();
 	}
 	else
 	{
@@ -125,25 +137,42 @@ void AFPSCharacter::Interact()
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Steering Mode"));
 				m_SteeringWheel = Cast<ASteeringWheel>(m_HitActor);
+
+				HideGrabPrompt();
+				ShowDropPrompt();
 			}
 			else if (m_HitActor->IsA<ASailControlWheel>())
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Sail Control Mode"));
 				m_SailControlWheel = Cast<ASailControlWheel>(m_HitActor);
+
+				HideGrabPrompt();
+				ShowDropPrompt();
 			}
 			else if (m_HitActor->IsA<AAltitudeLever>())
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Altitude Mode"));
 				m_AltitudeLever = Cast<AAltitudeLever>(m_HitActor);
+
+				HideGrabPrompt();
+				ShowDropPrompt();
 			}
 			else if (m_HitActor->IsA<APickUppable>())
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Pick Up Mode"));
 				m_PickedUpObject = Cast<APickUppable>(m_HitActor);
+				
 				GrabObject();
+				HideGrabPrompt();
+				ShowDropPrompt();
 
 				if (m_HitActor->IsA<AFireExtinguisher>())
+				{
 					m_FireExtinguisher = Cast<AFireExtinguisher>(m_HitActor);
+					ShowUsePrompt();
+				}
+				else
+					ShowThrowPrompt();
 			}
 		}
 	}
@@ -156,6 +185,9 @@ void AFPSCharacter::Throw()
 	else if (m_PickedUpObject)
 	{
 		DropObject();
+		HideDropPrompt();
+		HideThrowPrompt();
+
 		m_PickedUpObject->Throw(FirstPersonCameraComponent->GetForwardVector() * ObjectThrowImpulse);
 		m_PickedUpObject = nullptr;
 	}
@@ -250,12 +282,16 @@ void AFPSCharacter::CheckForInteractableActor()
 	{
 		m_HitPoint = Hit.ImpactPoint;
 		m_HitActor = Hit.GetActor();
+
+		ShowGrabPrompt();
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Hit Actor: %s"), *Hit.GetActor()->GetName()));
 	}
 	else
 	{
 		m_HitPoint = FVector::ZeroVector;
 		m_HitActor = nullptr;
+
+		HideGrabPrompt();
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No Hit Actor"));
 	}
 }
@@ -271,4 +307,67 @@ void AFPSCharacter::DropObject()
 {
 	m_PickedUpObject->GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
 	m_GrabConstraint->BreakConstraint();
+}
+
+void AFPSCharacter::ShowGrabPrompt()
+{
+	if (m_HitActor->IsA<ASteeringWheel>() || m_HitActor->IsA<ASailControlWheel>() || m_HitActor->IsA<AAltitudeLever>() || m_HitActor->IsA<APickUppable>())
+	{
+		if (!m_SailControlWheel && !m_SteeringWheel && !m_PickedUpObject && !m_FireExtinguisher && GrabPrompt)
+			GrabPrompt->AddToViewport();
+	}
+}
+
+void AFPSCharacter::HideGrabPrompt()
+{
+	if (GrabPrompt)
+		GrabPrompt->RemoveFromViewport();
+}
+
+void AFPSCharacter::ShowDropPrompt()
+{
+	if (DropPrompt)
+		DropPrompt->AddToViewport();
+}
+
+void AFPSCharacter::HideDropPrompt()
+{
+	if (DropPrompt)
+		DropPrompt->RemoveFromViewport();
+}
+
+void AFPSCharacter::ShowRepairPrompt()
+{
+	if (RepairPrompt)
+		RepairPrompt->AddToViewport();
+}
+
+void AFPSCharacter::HideRepairPrompt()
+{
+	if (RepairPrompt)
+		RepairPrompt->RemoveFromViewport();
+}
+
+void AFPSCharacter::ShowThrowPrompt()
+{
+	if (ThrowPrompt)
+		ThrowPrompt->AddToViewport();
+}
+
+void AFPSCharacter::HideThrowPrompt()
+{
+	if (ThrowPrompt)
+		ThrowPrompt->RemoveFromViewport();
+}
+
+void AFPSCharacter::ShowUsePrompt()
+{
+	if (UsePrompt)
+		UsePrompt->AddToViewport();
+}
+
+void AFPSCharacter::HideUsePrompt()
+{
+	if (UsePrompt)
+		UsePrompt->RemoveFromViewport();
 }
