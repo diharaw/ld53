@@ -27,7 +27,7 @@ void AAltitudeLeverHinge::BeginPlay()
 	if (m_AirShip)
 	{
 		m_TargetAngle = -(2.0f * m_AirShip->GetTargetAltitudeNormalized() - 1.0f) * MaxLeverHalfAngle;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Initial Target Angle: %f"), m_TargetAngle));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Initial Target Angle: %f"), m_TargetAngle));
 
 		FRotator TargetRotation = FRotator(m_TargetAngle, 0.0f, 0.0f);
 		SetActorRelativeRotation(TargetRotation);
