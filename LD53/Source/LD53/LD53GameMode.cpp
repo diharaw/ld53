@@ -21,7 +21,8 @@ void ALD53GameMode::BeginPlay()
 	TArray<AActor*> AirShips;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAirShip::StaticClass(), AirShips);
 
-	m_AirShip = Cast<AAirShip>(AirShips[0]);
+	if (AirShips.Num() > 0)
+		m_AirShip = Cast<AAirShip>(AirShips[0]);
 }
 
 AAirShip* ALD53GameMode::GetAirShip()
