@@ -54,6 +54,9 @@ class LD53_API AFPSCharacter : public ACharacter
 	class UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	UUserWidget* HUD;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
 	UUserWidget* PauseMenu;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")

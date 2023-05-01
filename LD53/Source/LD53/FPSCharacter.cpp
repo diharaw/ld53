@@ -46,6 +46,9 @@ void AFPSCharacter::BeginPlay()
 
 	m_GrabConstraint = FindComponentByClass<UPhysicsConstraintComponent>();
 	m_GrabSlotMesh = FindComponentByClass<UStaticMeshComponent>();
+
+	if (HUD)
+		HUD->AddToViewport();
 }
 
 // Called every frame
@@ -92,6 +95,12 @@ void AFPSCharacter::Interact()
 	{
 		DropObject();
 		m_PickedUpObject = nullptr;
+
+		if (m_FireExtinguisher)
+		{
+			m_FireExtinguisher->Deactivate();
+			m_FireExtinguisher = nullptr;
+		}
 	}
 	else if (m_SteeringWheel)
 	{
@@ -207,13 +216,11 @@ void AFPSCharacter::Look(const FInputActionValue& Value)
 		if (m_AltitudeLever)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Altitude Offset: %f"), LookAxisVector.Y));
-			m_AltitudeLever->MoveLever(-LookAxisVector.Y);
+			m_AltitudeLever->MoveLever(-LookAxisVector.Y * 10.0f);
 		}
-		else
-		{
-			AddControllerYawInput(LookAxisVector.X);
-			AddControllerPitchInput(LookAxisVector.Y);
-		}
+		
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
 
