@@ -5,6 +5,7 @@
 #include "Rudder.h"
 #include "AirShipEngine.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameOverUserWidget.h"
 
 float GetAngleDifferenceClockwise(float from, float to)
 {
@@ -27,7 +28,7 @@ void AAirShip::BeginPlay()
 {
 	Super::BeginPlay();
 
-	m_NumDeliveryItems = NumTotalDeliveryItems;
+	m_NumRemainingDeliveryItems = NumTotalDeliveryItems;
 	
 	GetWorld()->GetTimerManager().SetTimer(m_PowerConsumptionTimerHandle, this, &AAirShip::OnConsumePower, 1.0f, true);
 	GetWorld()->GetTimerManager().SetTimer(m_WindDirectionChangeTimerHandle, this, &AAirShip::OnWindDirectionChange, TimeBetweenWindDirectionChanges, true);
@@ -120,9 +121,14 @@ float AAirShip::GetTargetAltitudeNormalized()
 	return (TargetAltitude - MinAltitude) / (MaxAltitude - MinAltitude);
 }
 
-int AAirShip::GetNumDeliveryItems()
+int AAirShip::GetNumRemainingDeliveryItems()
 {
-	return m_NumDeliveryItems;
+	return m_NumRemainingDeliveryItems;
+}
+
+int AAirShip::GetNumDeliveredItems()
+{
+	return m_NumDeliveredItems;
 }
 
 int AAirShip::GetNumTotalDeliveryItems()
@@ -130,25 +136,68 @@ int AAirShip::GetNumTotalDeliveryItems()
 	return NumTotalDeliveryItems;
 }
 
+void AAirShip::ShowGameOverScreen(EGameOverReason _Reason)
+{
+	if (GameOverMenu)
+	{
+		GetWorld()->GetFirstPlayerController()->SetPause(true);
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
+		GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+
+		GameOverMenu->AddToViewport();
+
+		FString ScoreText;
+
+		if (_Reason == EGameOverReason::ShipDestroyed)
+		{
+			ScoreText = TEXT("Your Ship Was Destroyed!");
+			GameOverMenu->HideContinueButton();
+		}
+		else if (_Reason == EGameOverReason::FellToDeath)
+		{
+			ScoreText = TEXT("You Fell To Your Death!");
+			GameOverMenu->HideContinueButton();
+		}
+		else
+		{
+			ScoreText = FString::Printf(TEXT("Delivered %i out of %i Packages!"), GetNumDeliveredItems(), GetNumTotalDeliveryItems());
+			GameOverMenu->ShowContinueButton(1);
+		}
+
+		GameOverMenu->ShowScoreText(ScoreText);
+	}
+}
+
 void AAirShip::OnItemDelivered()
 {
-	if (m_NumDeliveryItems > 1)
+	if (m_NumRemainingDeliveryItems > 0)
 	{
-		m_NumDeliveryItems--;
+		m_NumRemainingDeliveryItems--;
 		m_NumDeliveredItems++;
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Item Delivered! Remaining: %i"), m_NumDeliveryItems));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Item Delivered! Remaining: %i"), m_NumRemainingDeliveryItems));
+
+		if (m_NumRemainingDeliveryItems == 0)
+			OnNoMoreItemsRemaining();
 	}
+}
+
+void AAirShip::OnNoMoreItemsRemaining()
+{
+	ShowGameOverScreen(EGameOverReason::Completed);
 }
 
 void AAirShip::OnItemLost()
 {
-	if (m_NumDeliveryItems > 1)
+	if (m_NumRemainingDeliveryItems > 0)
 	{
-		m_NumDeliveryItems--;
+		m_NumRemainingDeliveryItems--;
 		m_NumLostItems++;
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Item Lost! Remaining: %i"), m_NumDeliveryItems));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Item Lost! Remaining: %i"), m_NumRemainingDeliveryItems));
+
+		if (m_NumRemainingDeliveryItems == 0)
+			OnNoMoreItemsRemaining();
 	}
 }
 

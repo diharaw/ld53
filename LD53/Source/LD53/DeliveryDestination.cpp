@@ -74,15 +74,9 @@ void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent
 		OtherActor->DisableComponentsSimulatePhysics();
 
 		if (DeliveryItem->GetDestinationID() == m_DestinationID)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Item Delivered to Correct Destination!"));
 			GameMode->GetAirShip()->OnItemDelivered();
-		}
 		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Item Delivered to Incorrect Destination!"));
 			GameMode->GetAirShip()->OnItemLost();
-		}
 	}
 }
 

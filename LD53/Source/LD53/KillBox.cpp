@@ -7,6 +7,7 @@
 #include "DeliveryItem.h"
 #include "CoalSpawner.h"
 #include "AirShip.h"
+#include "FPSCharacter.h"
 
 // Sets default values
 AKillBox::AKillBox()
@@ -51,6 +52,14 @@ void AKillBox::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 		if (CoalSpawner)
 			CoalSpawner->DecreaseNumCoalChunks();
+	}
+	else if (OtherActor->IsA<AFPSCharacter>())
+	{
+		AirShip->ShowGameOverScreen(EGameOverReason::FellToDeath);
+	}
+	else if (OtherActor->IsA<AAirShip>())
+	{
+		AirShip->ShowGameOverScreen(EGameOverReason::ShipDestroyed);
 	}
 	else if (OtherActor->IsA<ADeliveryItem>())
 	{

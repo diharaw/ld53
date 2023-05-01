@@ -12,7 +12,10 @@
 #include "PickUppable.h"
 #include "SailControlWheel.h"
 #include "FireExtinguisher.h"
+#include "AirShip.h"
+#include "LD53GameMode.h"
 #include "Blueprint/UserWidget.h"
+#include "HUDUserWidget.h"
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
@@ -47,8 +50,8 @@ void AFPSCharacter::BeginPlay()
 	m_GrabConstraint = FindComponentByClass<UPhysicsConstraintComponent>();
 	m_GrabSlotMesh = FindComponentByClass<UStaticMeshComponent>();
 
-	if (HUD)
-		HUD->AddToViewport();
+	if (InGameHUD)
+		InGameHUD->AddToViewport();
 }
 
 // Called every frame
@@ -94,7 +97,7 @@ void AFPSCharacter::Interact()
 	if (m_PickedUpObject)
 	{
 		DropObject();
-		HideDropPrompt();
+		HidePrimaryPrompt();
 
 		m_PickedUpObject = nullptr;
 
@@ -102,32 +105,30 @@ void AFPSCharacter::Interact()
 		{
 			m_FireExtinguisher->Deactivate();
 			m_FireExtinguisher = nullptr;
-
-			HideUsePrompt();
 		}
-		else
-			HideThrowPrompt();
+		
+		HideSecondaryPrompt();
 	}
 	else if (m_SteeringWheel)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Steering Mode"));
 		m_SteeringWheel = nullptr;
 
-		HideDropPrompt();
+		HidePrimaryPrompt();
 	}
 	else if (m_SailControlWheel)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Sail Control Mode"));
 		m_SailControlWheel = nullptr;
 
-		HideDropPrompt();
+		HidePrimaryPrompt();
 	}
 	else if (m_AltitudeLever)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Exited Altitude Mode"));
 		m_AltitudeLever = nullptr;
 
-		HideDropPrompt();
+		HidePrimaryPrompt();
 	}
 	else
 	{
@@ -138,24 +139,24 @@ void AFPSCharacter::Interact()
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Steering Mode"));
 				m_SteeringWheel = Cast<ASteeringWheel>(m_HitActor);
 
-				HideGrabPrompt();
-				ShowDropPrompt();
+				HidePrimaryPrompt();
+				ShowLetGoPrompt();
 			}
 			else if (m_HitActor->IsA<ASailControlWheel>())
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Sail Control Mode"));
 				m_SailControlWheel = Cast<ASailControlWheel>(m_HitActor);
 
-				HideGrabPrompt();
-				ShowDropPrompt();
+				HidePrimaryPrompt();
+				ShowLetGoPrompt();
 			}
 			else if (m_HitActor->IsA<AAltitudeLever>())
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Entered Altitude Mode"));
 				m_AltitudeLever = Cast<AAltitudeLever>(m_HitActor);
 
-				HideGrabPrompt();
-				ShowDropPrompt();
+				HidePrimaryPrompt();
+				ShowLetGoPrompt();
 			}
 			else if (m_HitActor->IsA<APickUppable>())
 			{
@@ -163,7 +164,7 @@ void AFPSCharacter::Interact()
 				m_PickedUpObject = Cast<APickUppable>(m_HitActor);
 				
 				GrabObject();
-				HideGrabPrompt();
+				HidePrimaryPrompt();
 				ShowDropPrompt();
 
 				if (m_HitActor->IsA<AFireExtinguisher>())
@@ -185,8 +186,8 @@ void AFPSCharacter::Throw()
 	else if (m_PickedUpObject)
 	{
 		DropObject();
-		HideDropPrompt();
-		HideThrowPrompt();
+		HidePrimaryPrompt();
+		HideSecondaryPrompt();
 
 		m_PickedUpObject->Throw(FirstPersonCameraComponent->GetForwardVector() * ObjectThrowImpulse);
 		m_PickedUpObject = nullptr;
@@ -205,7 +206,8 @@ void AFPSCharacter::Pause()
 	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 
-	PauseMenu->AddToViewport();
+	if (PauseMenu)
+		PauseMenu->AddToViewport();
 }
 
 void AFPSCharacter::Move(const FInputActionValue& Value)
@@ -291,7 +293,8 @@ void AFPSCharacter::CheckForInteractableActor()
 		m_HitPoint = FVector::ZeroVector;
 		m_HitActor = nullptr;
 
-		HideGrabPrompt();
+		if (!m_SailControlWheel && !m_SteeringWheel && !m_AltitudeLever && !m_PickedUpObject && !m_FireExtinguisher)
+			HidePrimaryPrompt();
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No Hit Actor"));
 	}
 }
@@ -313,61 +316,49 @@ void AFPSCharacter::ShowGrabPrompt()
 {
 	if (m_HitActor->IsA<ASteeringWheel>() || m_HitActor->IsA<ASailControlWheel>() || m_HitActor->IsA<AAltitudeLever>() || m_HitActor->IsA<APickUppable>())
 	{
-		if (!m_SailControlWheel && !m_SteeringWheel && !m_PickedUpObject && !m_FireExtinguisher && GrabPrompt)
-			GrabPrompt->AddToViewport();
+		if (!m_SailControlWheel && !m_SteeringWheel && !m_PickedUpObject && !m_AltitudeLever && !m_FireExtinguisher && InGameHUD)
+			InGameHUD->ShowPrimaryPrompt(TEXT("Press 'F' to Grab"));
 	}
-}
-
-void AFPSCharacter::HideGrabPrompt()
-{
-	if (GrabPrompt)
-		GrabPrompt->RemoveFromViewport();
 }
 
 void AFPSCharacter::ShowDropPrompt()
 {
-	if (DropPrompt)
-		DropPrompt->AddToViewport();
+	if (InGameHUD)
+		InGameHUD->ShowPrimaryPrompt(TEXT("Press 'F' to Drop"));
 }
 
-void AFPSCharacter::HideDropPrompt()
+void AFPSCharacter::ShowLetGoPrompt()
 {
-	if (DropPrompt)
-		DropPrompt->RemoveFromViewport();
+	if (InGameHUD)
+		InGameHUD->ShowPrimaryPrompt(TEXT("Press 'F' to Let Go"));
 }
 
 void AFPSCharacter::ShowRepairPrompt()
 {
-	if (RepairPrompt)
-		RepairPrompt->AddToViewport();
-}
-
-void AFPSCharacter::HideRepairPrompt()
-{
-	if (RepairPrompt)
-		RepairPrompt->RemoveFromViewport();
+	if (InGameHUD)
+		InGameHUD->ShowPrimaryPrompt(TEXT("Hold 'F' to Repair"));
 }
 
 void AFPSCharacter::ShowThrowPrompt()
 {
-	if (ThrowPrompt)
-		ThrowPrompt->AddToViewport();
-}
-
-void AFPSCharacter::HideThrowPrompt()
-{
-	if (ThrowPrompt)
-		ThrowPrompt->RemoveFromViewport();
+	if (InGameHUD)
+		InGameHUD->ShowSecondaryPrompt(TEXT("'Left Click' to Throw"));
 }
 
 void AFPSCharacter::ShowUsePrompt()
 {
-	if (UsePrompt)
-		UsePrompt->AddToViewport();
+	if (InGameHUD)
+		InGameHUD->ShowSecondaryPrompt(TEXT("Hold 'Left Click' to Use"));
 }
 
-void AFPSCharacter::HideUsePrompt()
+void AFPSCharacter::HidePrimaryPrompt()
 {
-	if (UsePrompt)
-		UsePrompt->RemoveFromViewport();
+	if (InGameHUD)
+		InGameHUD->HidePrimaryPrompt();
+}
+
+void AFPSCharacter::HideSecondaryPrompt()
+{
+	if (InGameHUD)
+		InGameHUD->HideSecondaryPrompt();
 }

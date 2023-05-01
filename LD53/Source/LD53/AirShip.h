@@ -10,6 +10,13 @@
 class AAltitudeLeverHinge;
 class ARudder;
 
+UENUM(BlueprintType)
+enum class EGameOverReason : uint8 {
+	FellToDeath       UMETA(DisplayName = "Fell To Death"),
+	ShipDestroyed     UMETA(DisplayName = "Ship Destroyed"),
+	Completed         UMETA(DisplayName = "Completed"),
+};
+
 UCLASS()
 class LD53_API AAirShip : public AActor
 {
@@ -78,6 +85,9 @@ class LD53_API AAirShip : public AActor
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	int NumTotalDeliveryItems;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
+	class UGameOverUserWidget* GameOverMenu;
+
 private:
 	UStaticMeshComponent* m_Cube;
 	float m_ActualSpeed = 0.0f;
@@ -89,7 +99,7 @@ private:
 	float m_Power = 100.0f;
 	float m_WindHeading = 0.0f;
 	float m_SailRotation = 0.0f;
-	int m_NumDeliveryItems = 0;
+	int m_NumRemainingDeliveryItems = 0;
 	int m_NumDeliveredItems = 0;
 	int m_NumLostItems = 0;
 
@@ -136,13 +146,22 @@ public:
 	float GetTargetAltitudeNormalized();
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
-	int GetNumDeliveryItems();
+	int GetNumRemainingDeliveryItems();
+
+	UFUNCTION(BlueprintCallable, Category = "LD53")
+	int GetNumDeliveredItems();
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
 	int GetNumTotalDeliveryItems();
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
+	void ShowGameOverScreen(EGameOverReason _Reason);
+
+	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void OnItemDelivered();
+
+	UFUNCTION(BlueprintCallable, Category = "LD53")
+	void OnNoMoreItemsRemaining();
 
 	UFUNCTION(BlueprintCallable, Category = "LD53")
 	void OnItemLost();

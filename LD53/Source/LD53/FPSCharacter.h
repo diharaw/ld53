@@ -54,25 +54,10 @@ class LD53_API AFPSCharacter : public ACharacter
 	class UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
-	UUserWidget* HUD;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
 	UUserWidget* PauseMenu;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
-	UUserWidget* GrabPrompt;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
-	UUserWidget* DropPrompt;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
-	UUserWidget* RepairPrompt;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
-	UUserWidget* ThrowPrompt;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
-	UUserWidget* UsePrompt;
+	class UHUDUserWidget* InGameHUD;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
 	float MaxTraceDistance = 100.0f;
@@ -130,17 +115,11 @@ private:
 	void DropObject();
 
 	void ShowGrabPrompt();
-	void HideGrabPrompt();
-
 	void ShowDropPrompt();
-	void HideDropPrompt();
-
+	void ShowLetGoPrompt();
 	void ShowRepairPrompt();
-	void HideRepairPrompt();
-
 	void ShowThrowPrompt();
-	void HideThrowPrompt();
-
 	void ShowUsePrompt();
-	void HideUsePrompt();
+	void HidePrimaryPrompt();
+	void HideSecondaryPrompt();
 };
