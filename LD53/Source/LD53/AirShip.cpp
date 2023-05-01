@@ -56,13 +56,6 @@ void AAirShip::Tick(float _DeltaTime)
 	HandleAltitude(_DeltaTime);
 	HandleMovement(_DeltaTime);
 	HandleWindHeading(_DeltaTime);
-
-	if (!m_SetFire)
-	{
-		AAirShipEngine* Engine = Cast<AAirShipEngine>(m_Engines[0]);
-		Engine->SetOnFire();
-		m_SetFire = true;
-	}
 }
 
 void AAirShip::UpdateTargetSpeed(float _Speed)

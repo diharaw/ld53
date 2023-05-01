@@ -22,6 +22,7 @@ class LD53_API AAirShipEngine : public AActor
 private:
 	float m_Health = 100.0f;
 	int m_NumFires = 0;
+	TArray<AAirShipEnginePanel*> m_Panels;
 
 public:	
 	// Sets default values for this actor's properties

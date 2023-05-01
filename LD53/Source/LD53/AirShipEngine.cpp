@@ -16,7 +16,17 @@ AAirShipEngine::AAirShipEngine()
 void AAirShipEngine::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	TArray<AActor*> ChildActors;
+	GetAllChildActors(ChildActors, true);
+
+	m_Panels.Reserve(4);
+
+	for (int i = 0; i < ChildActors.Num(); i++)
+	{
+		if (ChildActors[i]->IsA<AAirShipEnginePanel>())
+			m_Panels.Add(Cast<AAirShipEnginePanel>(ChildActors[i]));
+	}
 }
 
 // Called every frame
