@@ -16,6 +16,9 @@
 #include "LD53GameMode.h"
 #include "Blueprint/UserWidget.h"
 #include "HUDUserWidget.h"
+#include "Sound/SoundCue.h"
+#include "Sound/SoundWave.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
