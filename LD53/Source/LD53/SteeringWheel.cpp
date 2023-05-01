@@ -3,6 +3,7 @@
 
 #include "SteeringWheel.h"
 #include "AirShip.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASteeringWheel::ASteeringWheel()
@@ -16,7 +17,12 @@ ASteeringWheel::ASteeringWheel()
 void ASteeringWheel::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	TArray<AActor*> AirShips;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAirShip::StaticClass(), AirShips);
+
+	if (AirShips.Num() > 0)
+		m_AirShip = Cast<AAirShip>(AirShips[0]);
 }
 
 // Called every frame
@@ -34,6 +40,6 @@ void ASteeringWheel::RotateWheel(float _direction)
 	Rotation += (_direction * Rate * GetWorld()->DeltaTimeSeconds);
 	
 	// Set target heading on AirShip
-	if (AirShip)
-		AirShip->UpdateTargetHeading(Rotation);
+	if (m_AirShip)
+		m_AirShip->UpdateTargetHeading(Rotation);
 }

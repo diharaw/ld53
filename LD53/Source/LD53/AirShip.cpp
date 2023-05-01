@@ -4,8 +4,12 @@
 #include "AirShip.h"
 #include "Rudder.h"
 #include "AirShipEngine.h"
+#include "Sail.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameOverUserWidget.h"
+#include "AltitudeLeverHinge.h"
+#include "HeadingIndicator.h"
+#include "WindHeadingIndicator.h"
 
 float GetAngleDifferenceClockwise(float from, float to)
 {
@@ -35,6 +39,31 @@ void AAirShip::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(m_ShipFaultTimerHandle, this, &AAirShip::OnShipFaultGeneration, TimeBetweenShipFaults, true);
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAirShipEngine::StaticClass(), m_Engines);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASail::StaticClass(), m_Sails);
+
+	TArray<AActor*> Rudders;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARudder::StaticClass(), Rudders);
+
+	if (Rudders.Num() > 0)
+		m_Rudder = Cast<ARudder>(Rudders[0]);
+
+	TArray<AActor*> Hinges;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAltitudeLeverHinge::StaticClass(), Hinges);
+
+	if (Hinges.Num() > 0)
+		m_AltitudeLeverHinge = Cast<AAltitudeLeverHinge>(Hinges[0]);
+
+	TArray<AActor*> HeadingIndicators;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHeadingIndicator::StaticClass(), HeadingIndicators);
+
+	if (HeadingIndicators.Num() > 0)
+		m_HeadingIndicator = Cast<AHeadingIndicator>(HeadingIndicators[0]);
+
+	TArray<AActor*> WindHeadingIndicators;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWindHeadingIndicator::StaticClass(), WindHeadingIndicators);
+
+	if (WindHeadingIndicators.Num() > 0)
+		m_WindHeadingIndicator = Cast<AWindHeadingIndicator>(WindHeadingIndicators[0]);
 
 	m_ActualAltitude = TargetAltitude;
 	m_ActualSpeed = TargetSpeed;
@@ -91,13 +120,13 @@ void AAirShip::AddCoalPiece()
 
 void AAirShip::RotateSail(float _Direction)
 {
-	if (Sail)
+	for (int i = 0 ; i < m_Sails.Num(); i++)
 	{
 		m_SailRotation += GetWorld()->GetDeltaSeconds() * _Direction * SailRotationSpeed;
 
 		FRotator SailRotation = FRotator(0.0f, m_SailRotation, 0.0f);
 
-		Sail->SetActorRelativeRotation(SailRotation.Quaternion());
+		m_Sails[i]->SetActorRelativeRotation(SailRotation.Quaternion());
 	}
 }
 
@@ -208,22 +237,22 @@ void AAirShip::HandleHeading(float _DeltaTime)
 
 	SetActorRotation(FinalRotation);
 
-	if (HeadingIndicator)
+	if (m_HeadingIndicator)
 	{
-		FRotator headingRotation = HeadingIndicator->GetActorRotation();
+		FRotator headingRotation = m_HeadingIndicator->GetActorRotation();
 
 		headingRotation.Yaw = TargetHeading;
 
-		HeadingIndicator->SetActorRotation(headingRotation);
+		m_HeadingIndicator->SetActorRotation(headingRotation);
 	}
 
-	if (Rudder)
+	if (m_Rudder)
 	{
 		float diff = GetAngleDifferenceClockwise(ActualTargetHeading, FinalRotation.Yaw);
 
 		FRotator rudderRotation = FRotator(0.0f, FMath::Clamp(-diff, -60.0f, 60.0f), 0.0f);
 
-		Rudder->SetActorRelativeRotation(rudderRotation);
+		m_Rudder->SetActorRelativeRotation(rudderRotation);
 	}
 }
 
@@ -254,14 +283,14 @@ void AAirShip::HandleAltitude(float _DeltaTime)
 
 void AAirShip::HandleWindHeading(float _DeltaTime)
 {
-	if (WindHeadingIndicator)
+	if (m_WindHeadingIndicator)
 	{
-		FRotator WindHeadingRotation = WindHeadingIndicator->GetActorRotation();
+		FRotator WindHeadingRotation = m_WindHeadingIndicator->GetActorRotation();
 		FRotator TargetWindHeadingRotation = FRotator(0.0f, m_WindHeading, 0.0f);
 
 		FRotator FinalRotation = FRotator(FQuat::Slerp(WindHeadingRotation.Quaternion(), TargetWindHeadingRotation.Quaternion(), _DeltaTime));
 
-		WindHeadingIndicator->SetActorRotation(FinalRotation);
+		m_WindHeadingIndicator->SetActorRotation(FinalRotation);
 	}
 }
 

@@ -3,6 +3,7 @@
 
 #include "AltitudeLever.h"
 #include "AltitudeLeverHinge.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AAltitudeLever::AAltitudeLever()
@@ -17,6 +18,12 @@ void AAltitudeLever::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	TArray<AActor*> Hinges;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAltitudeLeverHinge::StaticClass(), Hinges);
+
+	if (Hinges.Num() > 0)
+		m_AltitudeLeverHinge = Cast<AAltitudeLeverHinge>(Hinges[0]);
+
 }
 
 // Called every frame
@@ -28,6 +35,6 @@ void AAltitudeLever::Tick(float DeltaTime)
 
 void AAltitudeLever::MoveLever(float _amount)
 {
-	if (AltitudeLeverHinge)
-		AltitudeLeverHinge->MoveLever(_amount);
+	if (m_AltitudeLeverHinge)
+		m_AltitudeLeverHinge->MoveLever(_amount);
 }

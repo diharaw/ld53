@@ -9,6 +9,9 @@
 
 class AAltitudeLeverHinge;
 class ARudder;
+class ASail;
+class AHeadingIndicator;
+class AWindHeadingIndicator;
 
 UENUM(BlueprintType)
 enum class EGameOverReason : uint8 {
@@ -68,21 +71,6 @@ class LD53_API AAirShip : public AActor
 	float MinSailEffectiveness = 0.25f;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
-	AActor* HeadingIndicator;
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
-	AActor* WindHeadingIndicator;
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
-	AActor* Sail;
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
-	ARudder* Rudder;
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
-	AAltitudeLeverHinge* AltitudeLeverHinge;
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
 	int NumTotalDeliveryItems;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LD53", meta = (AllowPrivateAccess = "true"))
@@ -95,6 +83,11 @@ private:
 	FTimerHandle m_ShipFaultTimerHandle;
 	FTimerHandle m_WindDirectionChangeTimerHandle;
 	TArray<AActor*> m_Engines;
+	TArray<AActor*> m_Sails;
+	ARudder* m_Rudder = nullptr;
+	AHeadingIndicator* m_HeadingIndicator = nullptr;
+	AAltitudeLeverHinge* m_AltitudeLeverHinge = nullptr;
+	AActor* m_WindHeadingIndicator = nullptr;
 	float m_ActualAltitude = 0.0f;
 	float m_Power = 100.0f;
 	float m_WindHeading = 0.0f;

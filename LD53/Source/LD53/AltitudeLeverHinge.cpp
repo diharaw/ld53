@@ -3,6 +3,7 @@
 
 #include "AltitudeLeverHinge.h"
 #include "AirShip.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AAltitudeLeverHinge::AAltitudeLeverHinge()
@@ -17,9 +18,15 @@ void AAltitudeLeverHinge::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (AirShip)
+	TArray<AActor*> AirShips;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAirShip::StaticClass(), AirShips);
+
+	if (AirShips.Num() > 0)
+		m_AirShip = Cast<AAirShip>(AirShips[0]);
+
+	if (m_AirShip)
 	{
-		m_TargetAngle = -(2.0f * AirShip->GetTargetAltitudeNormalized() - 1.0f) * MaxLeverHalfAngle;
+		m_TargetAngle = -(2.0f * m_AirShip->GetTargetAltitudeNormalized() - 1.0f) * MaxLeverHalfAngle;
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Initial Target Angle: %f"), m_TargetAngle));
 
 		FRotator TargetRotation = FRotator(m_TargetAngle, 0.0f, 0.0f);
@@ -37,7 +44,7 @@ void AAltitudeLeverHinge::Tick(float DeltaTime)
 
 void AAltitudeLeverHinge::MoveLever(float _amount)
 {
-	if (AirShip)
+	if (m_AirShip)
 	{
 		m_TargetAngle -= _amount;
 		m_TargetAngle = FMath::Clamp(m_TargetAngle, -MaxLeverHalfAngle, MaxLeverHalfAngle);
@@ -45,6 +52,6 @@ void AAltitudeLeverHinge::MoveLever(float _amount)
 		FRotator TargetRotation = FRotator(m_TargetAngle, 0.0f, 0.0f);
 		SetActorRelativeRotation(TargetRotation);
 
-		AirShip->UpdateTargetAltitudeNormalized(1.0f - (m_TargetAngle + MaxLeverHalfAngle) / (MaxLeverHalfAngle * 2.0f));
+		m_AirShip->UpdateTargetAltitudeNormalized(1.0f - (m_TargetAngle + MaxLeverHalfAngle) / (MaxLeverHalfAngle * 2.0f));
 	}
 }

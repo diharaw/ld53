@@ -13,8 +13,8 @@ class LD53_API AAltitudeLever : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "LD53")
-	AAltitudeLeverHinge* AltitudeLeverHinge;
+private:
+	AAltitudeLeverHinge* m_AltitudeLeverHinge = nullptr;
 
 public:	
 	// Sets default values for this actor's properties

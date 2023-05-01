@@ -14,13 +14,11 @@ class LD53_API AAltitudeLeverHinge : public AActor
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
-	AAirShip* AirShip;
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
 	float MaxLeverHalfAngle = 60.0f;
 
 private:
 	float m_TargetAngle = 0.0f;
+	AAirShip* m_AirShip = nullptr;
 
 public:	
 	// Sets default values for this actor's properties
