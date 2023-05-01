@@ -3,7 +3,10 @@
 
 #include "Obstacle.h"
 #include "AirShip.h"
+#include "DeliveryItem.h"
+#include "CoalPiece.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AObstacle::AObstacle()
@@ -27,6 +30,12 @@ void AObstacle::BeginPlay()
 		m_TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AObstacle::OverlapBegin);
 		m_TriggerVolume->OnComponentEndOverlap.AddDynamic(this, &AObstacle::OverlapEnd);
 	}
+
+	TArray<AActor*> AirShips;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAirShip::StaticClass(), AirShips);
+
+	if (AirShips.Num() > 0)
+		m_AirShip = Cast<AAirShip>(AirShips[0]);
 }
 
 // Called every frame
@@ -38,11 +47,8 @@ void AObstacle::Tick(float DeltaTime)
 
 void AObstacle::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA<AAirShip>())
-	{
-		AAirShip* AirShip = Cast<AAirShip>(OtherActor);
-		AirShip->ShowGameOverScreen(EGameOverReason::ShipDestroyed);
-	}
+	if (!OtherActor->IsA<ACoalPiece>() && !OtherActor->IsA<ACoalPiece>())
+		m_AirShip->ShowGameOverScreen(EGameOverReason::ShipDestroyed);
 }
 
 void AObstacle::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

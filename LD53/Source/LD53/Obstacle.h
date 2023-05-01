@@ -13,6 +13,7 @@ class LD53_API AObstacle : public AActor
 
 private:
 	class USphereComponent* m_TriggerVolume = nullptr;
+	class AAirShip* m_AirShip = nullptr;
 
 public:	
 	// Sets default values for this actor's properties

@@ -74,7 +74,10 @@ void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent
 		OtherActor->DisableComponentsSimulatePhysics();
 
 		if (DeliveryItem->GetDestinationID() == m_DestinationID)
+		{
 			GameMode->GetAirShip()->OnItemDelivered();
+			m_Mesh->SetVisibility(false);
+		}
 		else
 			GameMode->GetAirShip()->OnItemLost();
 	}

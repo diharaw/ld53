@@ -74,7 +74,7 @@ void AAirShip::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 
 	GetWorld()->GetTimerManager().ClearTimer(m_PowerConsumptionTimerHandle);
-	GetWorld()->GetTimerManager().ClearTimer(m_WindDirectionChangeTimerHandle);
+	//GetWorld()->GetTimerManager().ClearTimer(m_WindDirectionChangeTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(m_ShipFaultTimerHandle);
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 }
@@ -87,7 +87,7 @@ void AAirShip::Tick(float _DeltaTime)
 	HandleHeading(_DeltaTime);
 	HandleAltitude(_DeltaTime);
 	HandleMovement(_DeltaTime);
-	HandleWindHeading(_DeltaTime);
+	//HandleWindHeading(_DeltaTime);
 }
 
 void AAirShip::UpdateTargetSpeed(float _Speed)
@@ -186,7 +186,8 @@ void AAirShip::ShowGameOverScreen(EGameOverReason _Reason)
 		else
 		{
 			ScoreText = FString::Printf(TEXT("Delivered %i out of %i Packages!"), GetNumDeliveredItems(), GetNumTotalDeliveryItems());
-			GameOverMenu->ShowContinueButton(1);
+			//GameOverMenu->ShowContinueButton(1);
+			GameOverMenu->HideContinueButton();
 		}
 
 		GameOverMenu->ShowScoreText(ScoreText);
@@ -262,7 +263,7 @@ void AAirShip::HandleMovement(float _DeltaTime)
 
 	FVector position = GetActorLocation();
 
-	position += GetActorForwardVector() * m_ActualSpeed * GetSailEffectiveness() * _DeltaTime;
+	position += GetActorForwardVector() * m_ActualSpeed * _DeltaTime;
 
 	SetActorLocation(position);
 }
@@ -299,7 +300,7 @@ void AAirShip::OnConsumePower()
 	m_Power -= PowerConsumptionRate;
 	m_Power = FMath::Clamp(m_Power, 0.0f, 100.0f);
 
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Ship Power: %f"), m_Power));
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Ship Power: %f"), m_Power));
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Sail Effectiveness: %f"), GetSailEffectiveness()));
 }
 
