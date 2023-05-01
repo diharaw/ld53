@@ -71,7 +71,7 @@ void UGameOverUserWidget::OnRestartClicked()
 	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
 
-	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetCurrentLevel()->GetName()), true);
+	UGameplayStatics::OpenLevel(this, "LV_Level1", true);
 }
 
 void UGameOverUserWidget::OnQuitClicked()
