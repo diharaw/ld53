@@ -8,6 +8,7 @@
 #include "CoalSpawner.h"
 #include "AirShip.h"
 #include "FPSCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AKillBox::AKillBox()
@@ -31,6 +32,18 @@ void AKillBox::BeginPlay()
 		m_TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AKillBox::OverlapBegin);
 		m_TriggerVolume->OnComponentEndOverlap.AddDynamic(this, &AKillBox::OverlapEnd);
 	}
+
+	TArray<AActor*> AirShips;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAirShip::StaticClass(), AirShips);
+
+	TArray<AActor*> CoalSpawners;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACoalSpawner::StaticClass(), CoalSpawners);
+
+	if (AirShips.Num() > 0)
+		m_AirShip = Cast<AAirShip>(AirShips[0]);
+
+	if (CoalSpawners.Num() > 0)
+		m_CoalSpawner = Cast<ACoalSpawner>(CoalSpawners[0]);
 }
 
 // Called every frame
@@ -50,16 +63,16 @@ void AKillBox::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 		OtherActor->Destroy();
 
-		if (CoalSpawner)
-			CoalSpawner->DecreaseNumCoalChunks();
+		if (m_CoalSpawner)
+			m_CoalSpawner->DecreaseNumCoalChunks();
 	}
 	else if (OtherActor->IsA<AFPSCharacter>())
 	{
-		AirShip->ShowGameOverScreen(EGameOverReason::FellToDeath);
+		m_AirShip->ShowGameOverScreen(EGameOverReason::FellToDeath);
 	}
 	else if (OtherActor->IsA<AAirShip>())
 	{
-		AirShip->ShowGameOverScreen(EGameOverReason::ShipDestroyed);
+		m_AirShip->ShowGameOverScreen(EGameOverReason::ShipDestroyed);
 	}
 	else if (OtherActor->IsA<ADeliveryItem>())
 	{
@@ -67,7 +80,7 @@ void AKillBox::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 		OtherActor->Destroy();
 
-		AirShip->OnItemLost();
+		m_AirShip->OnItemLost();
 	}
 }
 

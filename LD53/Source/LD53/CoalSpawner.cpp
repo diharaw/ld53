@@ -18,17 +18,8 @@ ACoalSpawner::ACoalSpawner()
 void ACoalSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	m_TriggerVolume = FindComponentByClass<UBoxComponent>();
 
-	if (m_TriggerVolume)
-	{
-		m_TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &ACoalSpawner::OverlapBegin);
-		m_TriggerVolume->OnComponentEndOverlap.AddDynamic(this, &ACoalSpawner::OverlapEnd);
-	}
-
-	GetWorld()->GetTimerManager().SetTimer(m_SpawnTimerHandle, this, &ACoalSpawner::OnSpawnCoalChunk, SpawnDelay, true);
-	 
+	GetWorld()->GetTimerManager().SetTimer(m_SpawnTimerHandle, this, &ACoalSpawner::OnSpawnCoalChunk, SpawnDelay, true); 
 }
 
 void ACoalSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -52,33 +43,15 @@ void ACoalSpawner::DecreaseNumCoalChunks()
 		m_NumSpawned--;
 }
 
-void ACoalSpawner::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor->IsA<AFPSCharacter>())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Present in Engine Room!"));
-		m_IsPlayerPresent = true;
-	}
-}
-
-void ACoalSpawner::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OtherActor->IsA<AFPSCharacter>())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Left Engine Room!"));
-		m_IsPlayerPresent = false;
-	}
-}
-
 void ACoalSpawner::OnSpawnCoalChunk()
 {
-	if (!m_IsPlayerPresent && SpawnPoint && m_NumSpawned < MaxCoalPieces)
+	if (m_NumSpawned < MaxCoalPieces)
 	{
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-		FVector Location = SpawnPoint->GetActorLocation() + FVector(FMath::RandRange(-SpawnRadius, SpawnRadius), FMath::RandRange(-SpawnRadius, SpawnRadius), 0.0f);
-		FRotator Rotation = SpawnPoint->GetActorRotation();
+		FVector Location = GetActorLocation() + FVector(FMath::RandRange(-SpawnRadius, SpawnRadius), FMath::RandRange(-SpawnRadius, SpawnRadius), 0.0f);
+		FRotator Rotation = GetActorRotation();
 
 		GetWorld()->SpawnActor(CoalClass, &Location, &Rotation, SpawnInfo);
 

@@ -11,14 +11,10 @@ class LD53_API AKillBox : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "LD53")
-	class AAirShip* AirShip;
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
-	class ACoalSpawner* CoalSpawner;
-
 private:
 	class UBoxComponent* m_TriggerVolume = nullptr;
+	class AAirShip* m_AirShip;
+	class ACoalSpawner* m_CoalSpawner;
 
 public:	
 	// Sets default values for this actor's properties

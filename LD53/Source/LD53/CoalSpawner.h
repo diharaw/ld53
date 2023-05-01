@@ -21,14 +21,9 @@ class LD53_API ACoalSpawner : public AActor
 	int MaxCoalPieces = 10;
 
 	UPROPERTY(EditAnywhere, Category = "LD53")
-	class AActor* SpawnPoint;
-
-	UPROPERTY(EditAnywhere, Category = "LD53")
 	UClass* CoalClass;
 
 private:
-	class UBoxComponent* m_TriggerVolume = nullptr;
-	bool m_IsPlayerPresent = false;
 	FTimerHandle m_SpawnTimerHandle;
 	int m_NumSpawned = 0;
 
@@ -47,11 +42,5 @@ public:
 	void DecreaseNumCoalChunks();
 
 private:
-	UFUNCTION()
-	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 	void OnSpawnCoalChunk();
 };
