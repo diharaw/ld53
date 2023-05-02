@@ -331,13 +331,13 @@ void AAirShip::OnConsumePower()
 
 	if (m_Power == 0.0f)
 	{
-		m_HUD->UpdatePowerLevelText(FString::Printf(TEXT("Ship Power: %f [Loosing Altitude]"), m_Power));
+		if (m_HUD) { m_HUD->UpdatePowerLevelText(FString::Printf(TEXT("Ship Power: %f [Loosing Altitude]"), m_Power)); }
 
 		if (!m_AudioComponent->IsPlaying())
 			m_AudioComponent->Play();
 	}
 	else
-		m_HUD->UpdatePowerLevelText(FString::Printf(TEXT("Ship Power: %f"), m_Power));
+		if (m_HUD) { m_HUD->UpdatePowerLevelText(FString::Printf(TEXT("Ship Power: %f"), m_Power)); }
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Ship Power: %f"), m_Power));
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Sail Effectiveness: %f"), GetSailEffectiveness()));
 }
