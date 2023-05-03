@@ -23,6 +23,7 @@ void ADeliveryDestination::BeginPlay()
 {
 	Super::BeginPlay();
 
+	m_Mesh = FindComponentByClass<UStaticMeshComponent>();
 	m_TriggerVolume = FindComponentByClass<UBoxComponent>();
 
 	if (m_TriggerVolume)
@@ -43,7 +44,7 @@ void ADeliveryDestination::Tick(float DeltaTime)
 
 void ADeliveryDestination::AssignIDAndColor(int _ID, FColor _Color, UMaterialInstance* _Material)
 {
-	m_DestinationID = _ID;
+	DestinationID = _ID;
 	m_Mesh = FindComponentByClass<UStaticMeshComponent>();
 
 	if (m_Mesh && _Material)
@@ -58,7 +59,7 @@ void ADeliveryDestination::AssignIDAndColor(int _ID, FColor _Color, UMaterialIns
 
 int ADeliveryDestination::GetDestinationID()
 {
-	return m_DestinationID;
+	return DestinationID;
 }
 
 void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -75,10 +76,25 @@ void ADeliveryDestination::OverlapBegin(UPrimitiveComponent* OverlappedComponent
 
 		OtherActor->DisableComponentsSimulatePhysics();
 
-		if (DeliveryItem->GetDestinationID() == m_DestinationID)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Destination ID: %i, Delivery Item ID: %i"), DestinationID, DeliveryItem->GetDestinationID()));
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Mesh Name: %s"), *m_Mesh->GetName()));
+
+
+		if (DeliveryItem->GetDestinationID() == DestinationID)
 		{
 			GameMode->GetAirShip()->OnItemDelivered();
-			m_Mesh->SetVisibility(false);
+			
+			for (UActorComponent* Component : GetComponents())
+			{
+				if (Component->IsA(UStaticMeshComponent::StaticClass()))
+				{
+					UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(Component);
+
+					if (Mesh)
+						Mesh->SetVisibility(false);
+				}
+			}
 		}
 		else
 			GameMode->GetAirShip()->OnItemLost();

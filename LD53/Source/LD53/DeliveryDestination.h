@@ -11,8 +11,10 @@ class LD53_API ADeliveryDestination : public AActor
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, Category = "LD53")
+	int DestinationID;
+
 private:
-	int m_DestinationID = 0;
 	class UStaticMeshComponent* m_Mesh = nullptr;
 	class UBoxComponent* m_TriggerVolume = nullptr;
 

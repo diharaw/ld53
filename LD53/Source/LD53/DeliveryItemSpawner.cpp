@@ -26,14 +26,16 @@ void ADeliveryItemSpawner::BeginPlay()
 	if (AirShips.Num() > 0)
 		m_AirShip = Cast<AAirShip>(AirShips[0]);
 
-	if (m_AirShip)
+	/*if (m_AirShip)
 	{
 		TArray<AActor*> Destinations;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADeliveryDestination::StaticClass(), Destinations);
 
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Destination Count: %i, Delivery Item Count: %i"), Destinations.Num(), m_AirShip->GetNumTotalDeliveryItems()));
+
 		if (Destinations.Num() != m_AirShip->GetNumTotalDeliveryItems())
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Mismatch between number of destinations and total number of delivery items!"));
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Mismatch between number of destinations and total number of delivery items!"));
 			return;
 		}
 
@@ -52,7 +54,7 @@ void ADeliveryItemSpawner::BeginPlay()
 
 		for (int i = 0; i < m_AirShip->GetNumTotalDeliveryItems(); i++)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Spawned delivery items!"));
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Spawned delivery items!"));
 
 			FActorSpawnParameters SpawnInfo;
 			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -71,9 +73,12 @@ void ADeliveryItemSpawner::BeginPlay()
 			ADeliveryDestination* DeliveryDestination = Cast<ADeliveryDestination>(Destinations[i]);
 
 			if (DeliveryDestination)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Mismatch between number of destinations and total number of delivery items!"));
 				DeliveryDestination->AssignIDAndColor(i, Color, DeliveryMarkerMaterial);
+			}
 		}
-	}
+	}*/
 }
 
 // Called every frame

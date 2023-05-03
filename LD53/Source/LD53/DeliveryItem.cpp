@@ -5,7 +5,7 @@
 
 void ADeliveryItem::AssignIDAndColor(int _ID, FColor _Color, UMaterialInstance* _Material)
 {
-	m_DestinationID = _ID;
+	DestinationID = _ID;
 	
 	if (m_Mesh && _Material)
 	{
@@ -19,5 +19,5 @@ void ADeliveryItem::AssignIDAndColor(int _ID, FColor _Color, UMaterialInstance* 
 
 int ADeliveryItem::GetDestinationID()
 {
-	return m_DestinationID;
+	return DestinationID;
 }

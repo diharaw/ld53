@@ -13,8 +13,8 @@ class LD53_API ADeliveryItem : public APickUppable
 {
 	GENERATED_BODY()
 
-private:
-	int m_DestinationID = 0;
+	UPROPERTY(EditAnywhere, Category = "LD53")
+	int DestinationID;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "LD53 Altitude Lever")
